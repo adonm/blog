@@ -34,4 +34,4 @@ theme = "hugo-theme-m10c"
   [[params.social]]
     icon = "brand-mastodon"
     name = "Mastodon"
-    url = "https://social.lol/adonm"
+    url = "https://social.lol/@adonm"
