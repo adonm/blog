@@ -1,0 +1,37 @@
+baseURL = 'https://blog.adonm.dev/'
+languageCode = 'en-us'
+title = 'My New Hugo Site'
+theme = "hugo-theme-m10c"
+
+[pagination]
+  pagerSize = 8
+
+[menu]
+  [[menu.main]]
+    identifier = "home"
+    name = "Home"
+    url = "/"
+    weight = 1
+  [[menu.main]]
+    identifier = "tags"
+    name = "Tags"
+    url = "/tags/"
+    weight = 2
+  [[menu.main]]
+    identifier = "about"
+    name = "About"
+    url = "/about/"
+    weight = 3
+
+[params]
+  author = "Adon Metcalfe"
+  description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+  menu_item_separator = " - "
+  [[params.social]]
+    icon = "brand-github"
+    name = "Github"
+    url = "https://github.com/adonm"
+  [[params.social]]
+    icon = "brand-mastodon"
+    name = "Mastodon"
+    url = "https://social.lol/adonm"
