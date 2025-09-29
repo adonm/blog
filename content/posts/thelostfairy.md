@@ -1,8 +1,10 @@
 +++
 date = '2025-06-30'
-title = 'The Lost Fairy Sister (by Farrah, eight)'
+title = 'The Lost Fairy Sister'
 tags = ["farrah", "kids", "story"]
 +++
+
+## written by Farrah, eight
 
 One day in a forest far away there lived two fairy sisters. But then one morning a terrible storm came and blew one of the sisters far away into the distance, so the other sister (Mery) set off to find her other sister Rose. She climbed through mountains and daring storms but still she was not afraid of the things that lay ahead.
 

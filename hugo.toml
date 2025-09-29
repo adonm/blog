@@ -23,6 +23,11 @@ theme = "hugo-theme-m10c"
     url = "https://adonm.dev"
     weight = 3
 
+[markup]
+ [markup.goldmark]
+   [markup.goldmark.renderer]
+     unsafe = true
+
 [params]
   author = "Adon Metcalfe"
   avatar = "https://profiles.cache.lol/adonm/picture"
