@@ -1,6 +1,6 @@
 baseURL = 'https://blog.adonm.dev/'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
+title = "adonm's blog"
 theme = "hugo-theme-m10c"
 
 [pagination]
@@ -25,7 +25,8 @@ theme = "hugo-theme-m10c"
 
 [params]
   author = "Adon Metcalfe"
-  description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+  avatar = "https://profiles.cache.lol/adonm/picture"
+  description = "My dear reader, I am merely cutting the cloth of reality. The pattern you see here is entirely up to your own interpretation."
   menu_item_separator = " - "
   [[params.social]]
     icon = "brand-github"
@@ -35,3 +36,9 @@ theme = "hugo-theme-m10c"
     icon = "brand-mastodon"
     name = "Mastodon"
     url = "https://social.lol/@adonm"
+[params.style]
+  darkestColor = "#1d2021"
+  darkColor = "#282828"
+  lightColor = "#d5c4a1"
+  lightestColor = "#ebdbb2"
+  primaryColor = "#fabd2f"
