@@ -1,0 +1,267 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 820" width="1200" height="820" role="img" aria-labelledby="flowTitle flowDesc" font-family="Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" shape-rendering="geometricPrecision">
+  <title id="flowTitle">OpenCode subagent delegation and verification flow</title>
+  <desc id="flowDesc">A primary agent plans and writes briefs, then dispatches an explore subagent and general subagents working in isolated git worktrees. A verification gate runs checks before any push, and results fan back into the primary agent for review and summary.</desc>
+
+  <defs>
+    <radialGradient id="bgGrad2" cx="72%" cy="0%" r="120%">
+      <stop offset="0" stop-color="#282828"/>
+      <stop offset="1" stop-color="#1d2021"/>
+    </radialGradient>
+    <pattern id="grid2" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#3c3836" stroke-width="1"/>
+    </pattern>
+    <filter id="glow2" x="-200%" y="-200%" width="400%" height="400%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <marker id="arrowY2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#fabd2f"/>
+    </marker>
+    <marker id="arrowG2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#b8bb26"/>
+    </marker>
+    <marker id="arrowA2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#83a598"/>
+    </marker>
+    <marker id="arrowE2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#8ec07c"/>
+    </marker>
+    <path id="pExplore" d="M 346 205 H 400"/>
+    <path id="pGeneral" d="M 346 421 H 400"/>
+    <path id="pWt1" d="M 740 390 C 765 390 765 358 790 358"/>
+    <path id="pWt2" d="M 740 452 C 765 452 765 474 790 474"/>
+    <path id="pFindings" d="M 570 302 V 312 H 346"/>
+    <path id="pGate" d="M 977 524 V 566"/>
+    <path id="pSummary" d="M 790 620 H 346"/>
+  </defs>
+
+  <style>
+    .h1 { font-size: 28px; font-weight: 700; fill: #ebdbb2; letter-spacing: -.3px; }
+    .sub { font-size: 13.5px; fill: #928374; }
+    .badge-text { font-size: 10px; font-weight: 700; fill: #fabd2f; letter-spacing: 2px; }
+    .section { font-size: 11px; font-weight: 700; letter-spacing: 2.4px; }
+    .card-title { font-size: 14.5px; font-weight: 700; fill: #ebdbb2; }
+    .body { font-size: 11px; fill: #d5c4a1; }
+    .muted { font-size: 10px; fill: #928374; }
+    .mono { font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; }
+    .code { font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 10.5px; fill: #b8bb26; }
+    .code-sm { font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 9.5px; fill: #928374; }
+    .dot { transform-box: fill-box; transform-origin: center; animation: dotPulse 2.2s ease-in-out infinite; }
+    .wbar { transform-box: fill-box; transform-origin: center bottom; animation: wave 1.4s ease-in-out infinite; }
+    .dash { stroke-dasharray: 3 11; animation: dash 1.6s linear infinite; }
+    @keyframes dotPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(.7); opacity: .4; }
+    }
+    @keyframes wave {
+      0%, 100% { transform: scaleY(.3); }
+      50% { transform: scaleY(1); }
+    }
+    @keyframes dash { to { stroke-dashoffset: -28; } }
+    @media (prefers-reduced-motion: reduce) {
+      .dot, .wbar, .dash { animation: none; }
+    }
+  </style>
+
+  <rect width="1200" height="820" fill="url(#bgGrad2)"/>
+  <rect width="1200" height="820" fill="url(#grid2)" opacity=".28"/>
+
+  <!-- Header -->
+  <rect x="48" y="34" width="5" height="28" rx="2.5" fill="#fabd2f"/>
+  <text class="h1" x="66" y="58">Delegation, isolation, verification</text>
+  <text class="sub" x="66" y="82">A global AGENTS.md splits planning from execution.</text>
+  <rect x="918" y="38" width="246" height="34" rx="17" fill="#282828" stroke="#504945"/>
+  <text class="badge-text" x="1041" y="60" text-anchor="middle">AGENTS.MD WORKFLOW</text>
+
+  <!-- Primary agent panel -->
+  <rect x="36" y="108" width="310" height="564" rx="16" fill="#282828" stroke="#504945"/>
+  <rect x="56" y="128" width="6" height="6" rx="1.5" fill="#fabd2f"/>
+  <text class="section" x="70" y="134" fill="#fabd2f">PRIMARY AGENT</text>
+  <text x="58" y="164" font-size="18" font-weight="700" fill="#ebdbb2">Primary Agent</text>
+  <rect x="58" y="174" width="118" height="22" rx="11" fill="#3c3836" stroke="#fabd2f" stroke-opacity=".55"/>
+  <text class="mono" x="117" y="189" font-size="9" fill="#fabd2f" text-anchor="middle">frontier model</text>
+  <text class="muted" x="58" y="214">Plans · decides · reviews</text>
+  <line x1="58" y1="228" x2="324" y2="228" stroke="#3c3836"/>
+
+  <!-- Stages -->
+  <circle cx="70" cy="252" r="11" fill="#3c3836" stroke="#fabd2f"/>
+  <text class="mono" x="70" y="256" font-size="9" font-weight="700" fill="#fabd2f" text-anchor="middle">1</text>
+  <text class="body" x="90" y="256">Scope the task</text>
+
+  <circle cx="70" cy="292" r="11" fill="#3c3836" stroke="#fabd2f"/>
+  <text class="mono" x="70" y="296" font-size="9" font-weight="700" fill="#fabd2f" text-anchor="middle">2</text>
+  <text class="body" x="90" y="296">Write subagent briefs</text>
+
+  <circle cx="70" cy="332" r="11" fill="#3c3836" stroke="#fabd2f"/>
+  <text class="mono" x="70" y="336" font-size="9" font-weight="700" fill="#fabd2f" text-anchor="middle">3</text>
+  <text class="body" x="90" y="336">Dispatch in parallel</text>
+
+  <circle cx="70" cy="372" r="11" fill="#3c3836" stroke="#fabd2f"/>
+  <text class="mono" x="70" y="376" font-size="9" font-weight="700" fill="#fabd2f" text-anchor="middle">4</text>
+  <text class="body" x="90" y="376">Review + spot-check</text>
+
+  <circle cx="70" cy="412" r="11" fill="#3c3836" stroke="#fabd2f"/>
+  <text class="mono" x="70" y="416" font-size="9" font-weight="700" fill="#fabd2f" text-anchor="middle">5</text>
+  <text class="body" x="90" y="416">Summarize and report</text>
+
+  <line x1="58" y1="436" x2="324" y2="436" stroke="#3c3836"/>
+  <text class="mono" x="58" y="462" font-size="9" letter-spacing="1.4" fill="#928374">CONTEXT DISCIPLINE</text>
+  <text class="body" x="58" y="484">Briefs carry goal, scope, size,</text>
+  <text class="body" x="58" y="502">gotchas, and done criteria.</text>
+
+  <line x1="58" y1="522" x2="324" y2="522" stroke="#3c3836"/>
+  <text class="muted" x="58" y="548">Primary context</text>
+  <rect x="58" y="558" width="266" height="8" rx="4" fill="#3c3836"/>
+  <rect x="58" y="558" width="96" height="8" rx="4" fill="#fabd2f" opacity=".85"/>
+  <text class="muted" x="58" y="582">small, focused, long-lived</text>
+  <text class="muted" x="58" y="614">Never edits the primary checkout.</text>
+
+  <!-- Explore subagent -->
+  <rect x="400" y="108" width="340" height="194" rx="16" fill="#282828" stroke="#504945"/>
+  <rect x="422" y="128" width="6" height="6" rx="1.5" fill="#8ec07c"/>
+  <text class="section" x="436" y="134" fill="#8ec07c">EXPLORE SUBAGENT</text>
+  <text class="mono" x="422" y="162" font-size="16" font-weight="700" fill="#ebdbb2">explore</text>
+  <rect x="662" y="144" width="62" height="20" rx="10" fill="#3c3836" stroke="#8ec07c" stroke-opacity=".55"/>
+  <text class="mono" x="693" y="158" font-size="8.5" fill="#8ec07c" text-anchor="middle">read-only</text>
+  <circle cx="696" cy="216" r="17" fill="none" stroke="#8ec07c" stroke-opacity=".35"/>
+  <line x1="708" y1="228" x2="720" y2="240" stroke="#8ec07c" stroke-opacity=".35" stroke-width="2"/>
+  <circle cx="422" cy="186" r="2.5" fill="#8ec07c"/>
+  <circle cx="422" cy="208" r="2.5" fill="#8ec07c"/>
+  <circle cx="422" cy="230" r="2.5" fill="#8ec07c"/>
+  <text class="body" x="434" y="190">glob · grep · file reads</text>
+  <text class="body" x="434" y="212">Maps code paths and context</text>
+  <text class="body" x="434" y="234">Returns findings, not patches</text>
+  <text class="code-sm" x="422" y="268">fast model · no writes</text>
+
+  <!-- Isolation card -->
+  <rect x="790" y="108" width="374" height="160" rx="16" fill="#282828" stroke="#504945"/>
+  <rect x="812" y="128" width="6" height="6" rx="1.5" fill="#83a598"/>
+  <text class="section" x="826" y="134" fill="#83a598">ISOLATION</text>
+  <text class="card-title" x="812" y="160">One worktree per task</text>
+  <circle cx="812" cy="180" r="2.5" fill="#83a598"/>
+  <circle cx="812" cy="200" r="2.5" fill="#83a598"/>
+  <circle cx="812" cy="220" r="2.5" fill="#83a598"/>
+  <text class="body" x="824" y="184">Separate checkout and index</text>
+  <text class="body" x="824" y="204">No branch contention</text>
+  <text class="body" x="824" y="224">Parallel edits stay safe</text>
+
+  <!-- General subagent -->
+  <rect x="400" y="324" width="340" height="194" rx="16" fill="#282828" stroke="#504945"/>
+  <rect x="422" y="344" width="6" height="6" rx="1.5" fill="#d3869b"/>
+  <text class="section" x="436" y="350" fill="#d3869b">GENERAL SUBAGENT</text>
+  <text class="mono" x="422" y="378" font-size="16" font-weight="700" fill="#ebdbb2">general</text>
+  <rect x="662" y="360" width="64" height="20" rx="10" fill="#3c3836" stroke="#d3869b" stroke-opacity=".55"/>
+  <text class="mono" x="694" y="374" font-size="8.5" fill="#d3869b" text-anchor="middle">isolated</text>
+  <circle cx="422" cy="402" r="2.5" fill="#d3869b"/>
+  <circle cx="422" cy="424" r="2.5" fill="#d3869b"/>
+  <circle cx="422" cy="446" r="2.5" fill="#d3869b"/>
+  <text class="body" x="434" y="406">Multi-step edits + commands</text>
+  <text class="body" x="434" y="428">One git worktree per task</text>
+  <text class="body" x="434" y="450">Structured brief in, report out</text>
+  <text class="code-sm" x="422" y="484">parallel-safe execution</text>
+
+  <!-- Worktrees -->
+  <text class="section" x="790" y="294" fill="#83a598">PARALLEL WORKTREES</text>
+
+  <rect x="790" y="308" width="374" height="100" rx="12" fill="#32302f" stroke="#504945"/>
+  <text class="mono" x="810" y="338" font-size="12" font-weight="700" fill="#ebdbb2">worktree-1</text>
+  <circle class="dot" cx="1124" cy="333" r="3" fill="#b8bb26"/>
+  <text class="muted" x="1116" y="337" text-anchor="end">editing</text>
+  <text class="code-sm" x="810" y="356">branch task/parser-cache</text>
+  <g fill="#83a598">
+    <rect class="wbar" x="810" y="378" width="6" height="10" rx="2" style="animation-delay:-0.1s"/>
+    <rect class="wbar" x="823" y="370" width="6" height="18" rx="2" fill="#8ec07c" style="animation-delay:-0.4s"/>
+    <rect class="wbar" x="836" y="362" width="6" height="26" rx="2" style="animation-delay:-0.7s"/>
+    <rect class="wbar" x="849" y="374" width="6" height="14" rx="2" fill="#8ec07c" style="animation-delay:-0.2s"/>
+    <rect class="wbar" x="862" y="358" width="6" height="30" rx="2" style="animation-delay:-0.5s"/>
+    <rect class="wbar" x="875" y="366" width="6" height="22" rx="2" fill="#8ec07c" style="animation-delay:-0.8s"/>
+    <rect class="wbar" x="888" y="376" width="6" height="12" rx="2" style="animation-delay:-0.3s"/>
+    <rect class="wbar" x="901" y="360" width="6" height="28" rx="2" fill="#8ec07c" style="animation-delay:-0.6s"/>
+    <rect class="wbar" x="914" y="372" width="6" height="16" rx="2" style="animation-delay:-0.15s"/>
+    <rect class="wbar" x="927" y="380" width="6" height="8" rx="2" fill="#8ec07c" style="animation-delay:-0.45s"/>
+  </g>
+  <text class="code-sm" x="1144" y="390" text-anchor="end">3 files changed</text>
+
+  <rect x="790" y="424" width="374" height="100" rx="12" fill="#32302f" stroke="#504945"/>
+  <text class="mono" x="810" y="454" font-size="12" font-weight="700" fill="#ebdbb2">worktree-2</text>
+  <circle class="dot" cx="1124" cy="449" r="3" fill="#fabd2f"/>
+  <text class="muted" x="1116" y="453" text-anchor="end">running tests</text>
+  <text class="code-sm" x="810" y="472">branch task/portal-retry</text>
+  <g fill="#fabd2f">
+    <rect class="wbar" x="810" y="494" width="6" height="10" rx="2" style="animation-delay:-0.6s"/>
+    <rect class="wbar" x="823" y="486" width="6" height="18" rx="2" fill="#fe8019" style="animation-delay:-0.2s"/>
+    <rect class="wbar" x="836" y="478" width="6" height="26" rx="2" style="animation-delay:-0.9s"/>
+    <rect class="wbar" x="849" y="490" width="6" height="14" rx="2" fill="#fe8019" style="animation-delay:-0.35s"/>
+    <rect class="wbar" x="862" y="474" width="6" height="30" rx="2" style="animation-delay:-0.75s"/>
+    <rect class="wbar" x="875" y="482" width="6" height="22" rx="2" fill="#fe8019" style="animation-delay:-0.1s"/>
+    <rect class="wbar" x="888" y="492" width="6" height="12" rx="2" style="animation-delay:-0.5s"/>
+    <rect class="wbar" x="901" y="476" width="6" height="28" rx="2" fill="#fe8019" style="animation-delay:-0.85s"/>
+    <rect class="wbar" x="914" y="488" width="6" height="16" rx="2" style="animation-delay:-0.25s"/>
+    <rect class="wbar" x="927" y="496" width="6" height="8" rx="2" fill="#fe8019" style="animation-delay:-0.65s"/>
+  </g>
+  <text class="code-sm" x="1144" y="506" text-anchor="end">2 files changed</text>
+
+  <!-- Verification gate -->
+  <rect x="790" y="566" width="374" height="104" rx="16" fill="#282828" stroke="#b8bb26" stroke-opacity=".55"/>
+  <rect x="812" y="582" width="6" height="6" rx="1.5" fill="#b8bb26"/>
+  <text class="section" x="826" y="588" fill="#b8bb26">VERIFICATION GATE</text>
+  <rect x="812" y="602" width="230" height="30" rx="6" fill="#1d2021" stroke="#3c3836"/>
+  <text class="code" x="822" y="621">check &amp;&amp; test &amp;&amp; push</text>
+  <text class="muted" x="812" y="654">set -e · stop on first failure</text>
+
+  <circle cx="1128" cy="622" r="22" fill="none" stroke="#b8bb26">
+    <animate attributeName="r" values="18;32" dur="2.4s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values=".55;0" dur="2.4s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="1128" cy="622" r="18" fill="#3c3836" stroke="#b8bb26"/>
+  <path d="M 1120 622 L 1126 628 L 1137 616" fill="none" stroke="#b8bb26" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Flow arrows -->
+  <path d="M 346 205 H 400" fill="none" stroke="#fabd2f" stroke-width="1.6" marker-end="url(#arrowY2)"/>
+  <text class="code-sm" x="352" y="197">brief</text>
+  <path d="M 346 421 H 400" fill="none" stroke="#fabd2f" stroke-width="1.6" marker-end="url(#arrowY2)"/>
+  <text class="code-sm" x="352" y="413">brief</text>
+
+  <path d="M 740 390 C 765 390 765 358 790 358" fill="none" stroke="#83a598" stroke-width="1.6" marker-end="url(#arrowA2)" stroke-opacity=".9"/>
+  <path d="M 740 452 C 765 452 765 474 790 474" fill="none" stroke="#83a598" stroke-width="1.6" marker-end="url(#arrowA2)" stroke-opacity=".9"/>
+
+  <path d="M 570 302 V 312 H 346" fill="none" stroke="#8ec07c" stroke-width="1.5" marker-end="url(#arrowE2)" stroke-dasharray="4 4"/>
+  <text class="code-sm" x="352" y="324">findings</text>
+
+  <path d="M 977 524 V 566" fill="none" stroke="#b8bb26" stroke-width="1.6" marker-end="url(#arrowG2)"/>
+  <text class="code-sm" x="987" y="548">merge</text>
+
+  <path d="M 790 620 H 346" fill="none" stroke="#fabd2f" stroke-width="1.6" marker-end="url(#arrowY2)" stroke-dasharray="5 5"/>
+  <text class="code-sm" x="560" y="612">summary fan-in</text>
+
+  <!-- Packets -->
+  <circle r="3.5" fill="#fabd2f" filter="url(#glow2)">
+    <animateMotion dur="2.2s" repeatCount="indefinite" begin="0s"><mpath href="#pExplore"/></animateMotion>
+  </circle>
+  <circle r="3.5" fill="#d3869b" filter="url(#glow2)">
+    <animateMotion dur="2.6s" repeatCount="indefinite" begin="-0.9s"><mpath href="#pGeneral"/></animateMotion>
+  </circle>
+  <circle r="3" fill="#83a598" filter="url(#glow2)">
+    <animateMotion dur="2.8s" repeatCount="indefinite" begin="0s"><mpath href="#pWt1"/></animateMotion>
+  </circle>
+  <circle r="3" fill="#83a598" filter="url(#glow2)">
+    <animateMotion dur="2.8s" repeatCount="indefinite" begin="-1.4s"><mpath href="#pWt2"/></animateMotion>
+  </circle>
+  <circle r="3" fill="#8ec07c" filter="url(#glow2)">
+    <animateMotion dur="3s" repeatCount="indefinite" begin="-0.6s"><mpath href="#pFindings"/></animateMotion>
+  </circle>
+  <circle r="3" fill="#b8bb26" filter="url(#glow2)">
+    <animateMotion dur="1.8s" repeatCount="indefinite" begin="0s"><mpath href="#pGate"/></animateMotion>
+  </circle>
+  <circle r="3.5" fill="#fabd2f" filter="url(#glow2)">
+    <animateMotion dur="4.6s" repeatCount="indefinite" begin="0s"><mpath href="#pSummary"/></animateMotion>
+  </circle>
+  <circle r="3" fill="#fabd2f" filter="url(#glow2)">
+    <animateMotion dur="4.6s" repeatCount="indefinite" begin="-2.3s"><mpath href="#pSummary"/></animateMotion>
+  </circle>
+
+  <text class="muted" x="600" y="800" text-anchor="middle" letter-spacing=".5">Plan centrally · execute in parallel · merge only through checks.</text>
+</svg>
