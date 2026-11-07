@@ -4,18 +4,22 @@ title = 'Bluefin, OpenCode, and Hex: An Immutable Linux Agentic Coding Setup'
 tags = ["linux", "bluefin", "opencode", "hex", "ai", "wayland"]
 +++
 
-Default Bluefin, one `dev` container, two curl installs. The host stays immutable; the container absorbs toolchain churn; `$HOME` carries the configuration. The highest-leverage piece is a global `AGENTS.md` that tells every agent how to write, delegate, verify, and choose the simplest design.
+Default [Bluefin](https://projectbluefin.io/) keeps the host immutable. One `dev` container absorbs toolchain churn. OpenCode and Hex land in `$HOME`, which carries the configuration. The highest-leverage piece is a global `AGENTS.md` that tells every agent how to write, delegate, verify, and choose the simplest design.
 
 ## The stack
 
 <img src="/images/bluefin-opencode-hex-architecture.svg" alt="Bluefin, OpenCode, and Hex architecture" style="width: 100%; max-width: 100%; margin: 1.5rem 0;">
 
-- **Default Bluefin.** `ghcr.io/ublue-os/bluefin-dx:stable` with zero layered `rpm-ostree` packages. The host keeps Wayland, PipeWire, Vulkan, Flatpak GUI apps, and atomic updates.
-- **One `dev` Distrobox.** Debian on rootless Podman. `mise` manages `rust`, `go`, `node`, `python`, and `gh`; the container handles mutable dependencies.
-- **OpenCode and Hex from curl.** Both install into `$HOME`, so the host and container share the same binaries and config. No host packages, no custom image.
+- **Default [Bluefin](https://projectbluefin.io/).** `ghcr.io/ublue-os/bluefin-dx:stable` with zero layered `rpm-ostree` packages. The host keeps Wayland, PipeWire, Vulkan, Flatpak GUI apps, and atomic updates.
+- **One `dev` [Distrobox](https://distrobox.it/).** Debian on rootless [Podman](https://podman.io/). [mise](https://mise.jdx.dev/) manages `rust`, `go`, `node`, `python`, and `gh`; the container handles mutable dependencies.
+- **[OpenCode](https://opencode.ai/) and [Hex](https://anoma.ly/hex) ([GitHub](https://github.com/anomalyco/hex)) from curl.** Both install into `$HOME`, so the host and container share the same binaries and config. No host packages, no custom image.
+
+Bootstrap the whole stack from the host:
 
 ```bash
+distrobox create --name dev --image debian:13
 curl https://mise.run | sh
+mise use -g rust go node python gh
 curl -fsSL https://opencode.ai/install | bash
 curl -fsSL https://anoma.ly/hex/install-linux.sh | sh
 ```
@@ -27,13 +31,13 @@ eval "$(mise activate bash)"
 opencode() { distrobox enter dev -- opencode "$@"; }
 ```
 
-`$HOME` is the contract: `~/.config/opencode`, `~/.config/mise`, `~/.local/share/hex`, and git worktrees are visible on both sides.
+`$HOME` is the contract: `~/.config/opencode`, `~/.config/mise`, `~/.local/share/hex`, and [git worktrees](https://git-scm.com/docs/git-worktree) are visible on both sides.
 
 ## Global AGENTS.md
 
 <img src="/images/opencode-delegation-flow.svg" alt="OpenCode subagent delegation and verification flow" style="width: 100%; max-width: 100%; margin: 1.5rem 0;">
 
-`~/.config/opencode/AGENTS.md` is the centerpiece. It applies to every project and every subagent. Exact contents:
+`~/.config/opencode/AGENTS.md` is the centerpiece. [OpenCode](https://opencode.ai/) reads it for every project and every subagent; see the [agents and config docs](https://opencode.ai/docs/). Exact contents:
 
 ```markdown
 # Writing
@@ -78,19 +82,19 @@ opencode() { distrobox enter dev -- opencode "$@"; }
 - Prefer plain data and functions over deep class hierarchies.
 ```
 
-Each section targets a specific failure mode:
+These rules encode mechanics and economics:
 
-### Writing
+### Context window hygiene
 
-Terse output cuts token spend and review noise. Subject-verb openers force direct statements. Separating prototype from production stops agents from describing intentions as shipped behavior.
+Exploration pollutes context fast: `grep` output, whole-file reads, and dead ends crowd out the task. The primary agent keeps the frontier model and spends its window on planning, decisions, review, and summary. Disposable `explore` and `general` subagents absorb search and edits, then return compact reports. Terse writing and briefs keep the main session sharp across long tasks.
 
-### Delegation
+### Parallelism without collisions
 
-The primary agent stays on the frontier model for planning, architecture, decisions, review, and summary. Hands-on work goes to fast subagents: `explore` for read-only search, `general` for multi-step edits and commands.
+Parallel subagents on one working tree corrupt each other's index and unstaged files. A separate [git worktree](https://git-scm.com/docs/git-worktree) per task gives each subagent an isolated directory backed by the same `.git` object store. Edits stay parallel; merges stay explicit.
 
-Every brief carries goal, scope, expected size, gotchas, and definition of done. Parallel tasks get separate git worktrees; no shared checkout, branch, or state.
+### Cost and latency split
 
-Pin the subagent models in `~/.config/opencode/opencode.jsonc`:
+`~/.config/opencode/opencode.jsonc` pins `explore` and `general` to a fast, cheap model while the primary session stays on a frontier model. Search and edits run at low latency and low cost; judgment stays with the expensive model.
 
 ```jsonc
 {
@@ -106,20 +110,20 @@ Pin the subagent models in `~/.config/opencode/opencode.jsonc`:
 }
 ```
 
-The primary keeps the expensive model; search and edits run cheap and parallel.
+The split spends frontier tokens on decisions, not typing.
 
-### Verification
+### Verification as a circuit breaker
 
-Irreversible steps wait on passing checks. `&&` or `set -e` gates `push`, `merge`, `deploy`, and `delete`. Failures surface immediately, before damage spreads.
+Irreversible steps carry the highest blast radius. `&&` or `set -e` gates `push`, `merge`, `deploy`, and `delete`; one failed check stops the chain before damage spreads.
 
-### Engineering principles
+### Prior art as compressed judgment
 
-The last section encodes three schools: Carson Gross (cut complexity, 80/20, locality of behavior, integration tests, Chesterton's fence), Mitchell Hashimoto (small increments, design from the user out, explicit code), and Casey Muratori (compression-oriented programming, plain data and functions, performance as design). The rules give agents a default against premature abstractions and layered bloat.
+The `# Engineering principles` section names specific mental models instead of generic advice. [The Grug Brained Developer](https://grugbrain.dev/) by Carson Gross and [Locality of Behavior](https://htmx.org/essays/locality-of-behavior/) push against layered indirection. [Chesterton's fence](https://en.wikipedia.org/wiki/G._K._Chesterton#Chesterton's_fence) blocks deletion without understanding. [Mitchell Hashimoto's writing](https://mitchellh.com/writing) favors small increments and explicit code. [Casey Muratori](https://caseymuratori.com/)'s [Semantic Compression](https://caseymuratori.com/blog_0015) favors concrete code, plain data, and measured performance. Naming these models steers agents away from enterprise wrapper classes, premature abstractions, and unrequested features.
 
 ## Hex: local voice input
 
 <img src="/images/hex-voice-pipeline.svg" alt="Hex local voice dictation pipeline" style="width: 100%; max-width: 100%; margin: 1.5rem 0;">
 
-Hex runs local voice dictation on the Vulkan iGPU: `parakeet-unified-en` for ASR, Silero VAD for speech gating, then spoken formatting and filler-word removal. Press `F8` to dictate subagent briefs and review feedback straight into the terminal or OpenCode. Audio never leaves the machine.
+[Hex](https://anoma.ly/hex) runs local voice dictation on the Vulkan iGPU: [Parakeet](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2) for ASR, [Silero VAD](https://github.com/snakers4/silero-vad) for speech gating, then spoken formatting and filler-word removal. Press `F8` to dictate subagent briefs and review feedback straight into the terminal or [OpenCode](https://opencode.ai/). Audio never leaves the machine.
 
-Default host, one container, two curl installs, one global brief. That is most of the setup.
+The default host, one container, two app installs, and one global brief cover most of the setup.
