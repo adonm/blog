@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" role="img" aria-labelledby="archTitle archDesc" font-family="Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" shape-rendering="geometricPrecision">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 888" width="1200" height="888" role="img" aria-labelledby="archTitle archDesc" font-family="Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" shape-rendering="geometricPrecision">
   <title id="archTitle">Bluefin, OpenCode, and Hex architecture</title>
-  <desc id="archDesc">An immutable Bluefin DX host runs Hex and the OpenCode desktop app. A wrapper script crosses a shared home directory into a mutable Debian distrobox container that serves OpenCode with mise toolchains.</desc>
+  <desc id="archDesc">A default immutable Bluefin DX host runs Hex for local voice dictation. A shared home directory carries AGENTS.md, OpenCode model routing, mise configuration, and git worktrees into a mutable Debian dev distrobox that runs mise toolchains and OpenCode with a frontier primary agent plus fast explore and general subagents.</desc>
 
   <defs>
-    <radialGradient id="bgGrad" cx="28%" cy="0%" r="120%">
+    <radialGradient id="bgGrad" cx="50%" cy="0%" r="120%">
       <stop offset="0" stop-color="#282828"/>
       <stop offset="1" stop-color="#1d2021"/>
     </radialGradient>
@@ -11,28 +11,22 @@
       <stop offset="0" stop-color="#fe8019" stop-opacity=".55"/>
       <stop offset="1" stop-color="#fe8019" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="greenGlow" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#b8bb26" stop-opacity=".45"/>
-      <stop offset="1" stop-color="#b8bb26" stop-opacity="0"/>
-    </radialGradient>
     <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
       <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#3c3836" stroke-width="1"/>
     </pattern>
     <filter id="glow" x="-200%" y="-200%" width="400%" height="400%">
-      <feGaussianBlur stdDeviation="3.2" result="blur"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-    <marker id="arrowYellow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#fabd2f"/>
+    <marker id="arrowAqua" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#83a598"/>
     </marker>
-    <marker id="arrowAqua" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#8ec07c"/>
-    </marker>
-    <path id="bridgeFlow" d="M 56 596 H 1144"/>
-    <path id="dropFlow" d="M 906 596 V 640"/>
+    <path id="upFlow" d="M 600 344 V 376"/>
+    <path id="downFlow" d="M 600 532 V 564"/>
+    <path id="sharedFlow" d="M 56 516 H 1144"/>
   </defs>
 
   <style>
@@ -40,13 +34,12 @@
     .sub { font-size: 13.5px; fill: #928374; }
     .badge-text { font-size: 10px; font-weight: 700; fill: #fabd2f; letter-spacing: 2px; }
     .section { font-size: 11px; font-weight: 700; letter-spacing: 2.4px; }
-    .panel-title { font-size: 22px; font-weight: 700; fill: #ebdbb2; }
-    .card-title { font-size: 14.5px; font-weight: 700; fill: #ebdbb2; }
+    .card-title { font-size: 17px; font-weight: 700; fill: #ebdbb2; }
     .body { font-size: 11px; fill: #d5c4a1; }
     .body-sm { font-size: 10.5px; fill: #d5c4a1; }
     .muted { font-size: 10px; fill: #928374; }
     .mono { font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; }
-    .code { font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 10.5px; fill: #fabd2f; }
+    .code { font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 9.5px; fill: #fabd2f; }
     .code-sm { font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 9.5px; fill: #928374; }
     .pulse { transform-box: fill-box; transform-origin: center; animation: pulse 3s ease-in-out infinite; }
     .dot { transform-box: fill-box; transform-origin: center; animation: dotPulse 2.2s ease-in-out infinite; }
@@ -70,180 +63,169 @@
     }
   </style>
 
-  <rect width="1200" height="900" fill="url(#bgGrad)"/>
-  <rect width="1200" height="900" fill="url(#grid)" opacity=".28"/>
+  <rect width="1200" height="888" fill="url(#bgGrad)"/>
+  <rect width="1200" height="888" fill="url(#grid)" opacity=".28"/>
 
   <!-- Header -->
   <rect x="48" y="34" width="5" height="28" rx="2.5" fill="#fabd2f"/>
   <text class="h1" x="66" y="58">Bluefin · OpenCode · Hex</text>
-  <text class="sub" x="66" y="82">An immutable Fedora host drives a mutable Debian container through one wrapper.</text>
+  <text class="sub" x="66" y="82">Default immutable host. One dev container. Two curl installs.</text>
   <rect x="918" y="38" width="246" height="34" rx="17" fill="#282828" stroke="#504945"/>
-  <text class="badge-text" x="1041" y="60" text-anchor="middle">WORKSTATION ARCHITECTURE</text>
+  <text class="badge-text" x="1041" y="60" text-anchor="middle">80/20 WORKSTATION</text>
 
   <!-- Host panel -->
-  <rect x="36" y="108" width="704" height="352" rx="16" fill="#282828" stroke="#504945"/>
-  <rect x="56" y="128" width="6" height="6" rx="1.5" fill="#fabd2f"/>
-  <text class="section" x="70" y="134" fill="#fabd2f">01 · BLUEFIN DX HOST</text>
-  <text class="panel-title" x="56" y="164">Bluefin DX</text>
-  <text class="muted" x="200" y="163">immutable Fedora Silverblue</text>
-  <text class="muted" x="56" y="182">GNOME Wayland · PipeWire · Vulkan · zero layered rpm-ostree packages</text>
+  <rect x="36" y="106" width="1128" height="238" rx="16" fill="#282828" stroke="#504945"/>
+  <rect x="56" y="126" width="6" height="6" rx="1.5" fill="#fabd2f"/>
+  <text class="section" x="70" y="132" fill="#fabd2f">01 · BLUEFIN DX HOST</text>
+  <text class="code-sm" x="1144" y="132" text-anchor="end">immutable · zero rpm-ostree layering</text>
+
+  <!-- Bluefin card -->
+  <rect x="56" y="152" width="520" height="170" rx="12" fill="#32302f" stroke="#504945"/>
+  <text class="card-title" x="76" y="184">Default Bluefin</text>
+  <rect x="470" y="168" width="86" height="22" rx="11" fill="#3c3836" stroke="#fabd2f" stroke-opacity=".5"/>
+  <text class="mono" x="513" y="183" font-size="8.5" fill="#fabd2f" text-anchor="middle">immutable</text>
+  <text class="muted" x="76" y="204">Fedora Silverblue · GNOME Wayland</text>
+
+  <circle cx="80" cy="228" r="2.5" fill="#fabd2f"/>
+  <text class="body" x="92" y="232">Zero layered rpm-ostree packages</text>
+  <circle cx="80" cy="254" r="2.5" fill="#83a598"/>
+  <text class="body" x="92" y="258">Wayland · PipeWire · Vulkan iGPU</text>
+  <circle cx="80" cy="280" r="2.5" fill="#8ec07c"/>
+  <text class="body" x="92" y="284">Flatpak GUI apps · atomic updates</text>
+  <text class="code" x="76" y="312">ghcr.io/ublue-os/bluefin-dx:stable</text>
 
   <!-- Hex card -->
-  <rect x="56" y="198" width="330" height="242" rx="12" fill="#32302f" stroke="#504945"/>
-  <text x="76" y="228" font-size="20" font-weight="700" fill="#ebdbb2">Hex</text>
-  <rect x="286" y="214" width="80" height="20" rx="10" fill="#3c3836" stroke="#b8bb26" stroke-opacity=".55"/>
-  <circle class="dot" cx="298" cy="224" r="3" fill="#b8bb26"/>
-  <text class="mono" x="308" y="227.5" font-size="9" fill="#b8bb26">hex.service</text>
-  <text class="muted" x="76" y="247">Local voice dictation · anomaly.hex</text>
+  <rect x="596" y="152" width="548" height="170" rx="12" fill="#32302f" stroke="#504945"/>
+  <text class="card-title" x="616" y="184">Hex</text>
+  <rect x="1042" y="168" width="86" height="22" rx="11" fill="#3c3836" stroke="#fe8019" stroke-opacity=".5"/>
+  <text class="mono" x="1085" y="183" font-size="8.5" fill="#fe8019" text-anchor="middle">curl install</text>
+  <text class="muted" x="616" y="204">Local voice dictation</text>
 
-  <circle class="pulse" cx="100" cy="292" r="30" fill="url(#hexGlow)"/>
-  <circle cx="100" cy="292" r="14" fill="#3c3836" stroke="#fe8019"/>
-  <text class="mono" x="100" y="296" font-size="8.5" font-weight="700" fill="#fe8019" text-anchor="middle">GPU</text>
-  <text class="body" x="136" y="287" font-weight="600">Vulkan iGPU inference</text>
-  <text class="code-sm" x="136" y="303">parakeet-unified-en · GGUF</text>
+  <circle class="pulse" cx="648" cy="256" r="30" fill="url(#hexGlow)"/>
+  <circle cx="648" cy="256" r="14" fill="#3c3836" stroke="#fe8019"/>
+  <text class="mono" x="648" y="259.5" font-size="8.5" font-weight="700" fill="#fe8019" text-anchor="middle">GPU</text>
+  <text class="body" x="684" y="248" font-weight="600">Vulkan iGPU</text>
+  <text class="code-sm" x="684" y="266">parakeet-unified-en · Silero VAD</text>
+  <circle cx="620" cy="296" r="2.5" fill="#8ec07c"/>
+  <text class="body-sm" x="632" y="300">F8 dictate · audio never leaves the machine</text>
 
-  <line x1="76" y1="320" x2="366" y2="320" stroke="#3c3836"/>
-  <circle cx="80" cy="340" r="2.5" fill="#8ec07c"/>
-  <text class="body" x="92" y="344">PipeWire microphone capture</text>
-  <circle cx="80" cy="362" r="2.5" fill="#83a598"/>
-  <text class="body" x="92" y="366">Wayland portals · F8 / F9</text>
-  <circle cx="80" cy="384" r="2.5" fill="#d3869b"/>
-  <text class="body" x="92" y="388">history + settings in $HOME</text>
-  <text class="code-sm" x="76" y="414">~/.local/share/hex</text>
-
-  <!-- Animated microphone waveform inside Hex card -->
   <g fill="#fe8019">
-    <rect class="wbar" x="252" y="414" width="5" height="8" rx="2.5" style="animation-delay:-0.1s"/>
-    <rect class="wbar" x="264" y="406" width="5" height="16" rx="2.5" fill="#fabd2f" style="animation-delay:-0.3s"/>
-    <rect class="wbar" x="276" y="398" width="5" height="24" rx="2.5" style="animation-delay:-0.5s"/>
-    <rect class="wbar" x="288" y="408" width="5" height="14" rx="2.5" fill="#fabd2f" style="animation-delay:-0.2s"/>
-    <rect class="wbar" x="300" y="394" width="5" height="28" rx="2.5" style="animation-delay:-0.6s"/>
-    <rect class="wbar" x="312" y="402" width="5" height="20" rx="2.5" fill="#fabd2f" style="animation-delay:-0.4s"/>
-    <rect class="wbar" x="324" y="410" width="5" height="12" rx="2.5" style="animation-delay:-0.7s"/>
-    <rect class="wbar" x="336" y="400" width="5" height="22" rx="2.5" fill="#fabd2f" style="animation-delay:-0.15s"/>
-    <rect class="wbar" x="348" y="412" width="5" height="10" rx="2.5" style="animation-delay:-0.55s"/>
-    <rect class="wbar" x="360" y="416" width="5" height="6" rx="2.5" fill="#fabd2f" style="animation-delay:-0.35s"/>
+    <rect class="wbar" x="992" y="298" width="6" height="8" rx="3" style="animation-delay:-0.1s"/>
+    <rect class="wbar" x="1006" y="290" width="6" height="16" rx="3" fill="#fabd2f" style="animation-delay:-0.3s"/>
+    <rect class="wbar" x="1020" y="282" width="6" height="24" rx="3" style="animation-delay:-0.5s"/>
+    <rect class="wbar" x="1034" y="294" width="6" height="12" rx="3" fill="#fabd2f" style="animation-delay:-0.2s"/>
+    <rect class="wbar" x="1048" y="278" width="6" height="28" rx="3" style="animation-delay:-0.6s"/>
+    <rect class="wbar" x="1062" y="286" width="6" height="20" rx="3" fill="#fabd2f" style="animation-delay:-0.4s"/>
+    <rect class="wbar" x="1076" y="296" width="6" height="10" rx="3" style="animation-delay:-0.7s"/>
+    <rect class="wbar" x="1090" y="284" width="6" height="22" rx="3" fill="#fabd2f" style="animation-delay:-0.15s"/>
+    <rect class="wbar" x="1104" y="292" width="6" height="14" rx="3" style="animation-delay:-0.55s"/>
+    <rect class="wbar" x="1118" y="300" width="6" height="6" rx="3" fill="#fabd2f" style="animation-delay:-0.35s"/>
   </g>
 
-  <!-- OpenCode desktop card -->
-  <rect x="402" y="198" width="318" height="104" rx="12" fill="#32302f" stroke="#504945"/>
-  <text class="card-title" x="422" y="226">OpenCode Desktop</text>
-  <circle class="dot" cx="700" cy="221" r="3" fill="#b8bb26"/>
-  <text class="muted" x="692" y="225" text-anchor="end">running</text>
-  <text class="code" x="422" y="245">OpenCode.AppImage</text>
-  <text class="muted" x="422" y="266">Host GUI process · native Wayland window</text>
-  <text class="muted" x="422" y="284">Reaches the container through the wrapper</text>
+  <!-- Shared HOME -->
+  <rect x="36" y="376" width="1128" height="156" rx="16" fill="#282828" stroke="#504945"/>
+  <rect x="56" y="396" width="6" height="6" rx="1.5" fill="#83a598"/>
+  <text class="section" x="70" y="402" fill="#83a598">02 · SHARED $HOME</text>
+  <text class="code-sm" x="1144" y="402" text-anchor="end">read by host and container</text>
 
-  <!-- Ptyxis card -->
-  <rect x="402" y="314" width="318" height="126" rx="12" fill="#32302f" stroke="#504945"/>
-  <text class="card-title" x="422" y="342">Ptyxis Terminal</text>
-  <text class="muted" x="422" y="360">Host shell · TTY path</text>
-  <rect x="422" y="372" width="278" height="26" rx="6" fill="#1d2021" stroke="#3c3836"/>
-  <text class="code-sm" x="432" y="389" fill="#8ec07c">opencode() → distrobox-enter dev</text>
-  <text class="code-sm" x="422" y="416">PATH includes ~/.opencode/bin</text>
+  <rect x="56" y="422" width="340" height="78" rx="10" fill="#32302f" stroke="#504945"/>
+  <rect x="72" y="438" width="5" height="5" rx="1.5" fill="#fabd2f"/>
+  <text class="mono" x="72" y="466" font-size="11.5" font-weight="700" fill="#fabd2f">~/.config/opencode/AGENTS.md</text>
+  <text class="muted" x="72" y="484">global writing + delegation rules</text>
 
-  <!-- Bridge band -->
-  <rect x="36" y="488" width="1128" height="120" rx="16" fill="#282828" stroke="#504945"/>
-  <rect x="56" y="508" width="6" height="6" rx="1.5" fill="#83a598"/>
-  <text class="section" x="70" y="514" fill="#83a598">02 · BRIDGE</text>
-  <text class="code-sm" x="1144" y="514" text-anchor="end">host ⇄ container</text>
+  <rect x="412" y="422" width="240" height="78" rx="10" fill="#32302f" stroke="#504945"/>
+  <rect x="428" y="438" width="5" height="5" rx="1.5" fill="#8ec07c"/>
+  <text class="mono" x="428" y="466" font-size="11.5" font-weight="700" fill="#8ec07c">opencode.jsonc</text>
+  <text class="muted" x="428" y="484">model routing for subagents</text>
 
-  <line x1="501" y1="506" x2="501" y2="582" stroke="#3c3836"/>
-  <line x1="891" y1="506" x2="891" y2="582" stroke="#3c3836"/>
+  <rect x="668" y="422" width="190" height="78" rx="10" fill="#32302f" stroke="#504945"/>
+  <rect x="684" y="438" width="5" height="5" rx="1.5" fill="#d3869b"/>
+  <text class="mono" x="684" y="466" font-size="11.5" font-weight="700" fill="#d3869b">mise.toml</text>
+  <text class="muted" x="684" y="484">toolchain versions</text>
 
-  <text class="mono" x="56" y="540" font-size="12" font-weight="700" fill="#fabd2f">~/.opencode/bin/opencode</text>
-  <text class="body-sm" x="56" y="560">scrubs LD_LIBRARY_PATH · APPIMAGE · APPDIR · ARGV0 · OWD</text>
-  <text class="muted" x="56" y="578">strips /tmp/.mount_* from XDG_DATA_DIRS</text>
+  <rect x="874" y="422" width="270" height="78" rx="10" fill="#32302f" stroke="#504945"/>
+  <rect x="890" y="438" width="5" height="5" rx="1.5" fill="#83a598"/>
+  <text class="mono" x="890" y="466" font-size="11.5" font-weight="700" fill="#83a598">git worktrees</text>
+  <text class="muted" x="890" y="484">isolated parallel tasks</text>
 
-  <text class="mono" x="516" y="540" font-size="12" font-weight="700" fill="#83a598">Shared $HOME</text>
-  <text class="body-sm" x="516" y="560">~/.config/opencode · ~/.local/share/opencode</text>
-  <text class="muted" x="516" y="578">~/.local/share/hex · sessions · history</text>
+  <line x1="56" y1="516" x2="1144" y2="516" stroke="#3c3836" stroke-width="2"/>
+  <line x1="56" y1="516" x2="1144" y2="516" stroke="#83a598" stroke-width="1.5" opacity=".25" class="dash"/>
 
-  <text class="mono" x="906" y="540" font-size="12" font-weight="700" fill="#8ec07c">Route</text>
-  <text class="code-sm" x="906" y="560">distrobox-enter dev  (TTY)</text>
-  <text class="code-sm" x="906" y="578">systemd-run --user --scope</text>
-
-  <!-- Bridge conduit -->
-  <line x1="56" y1="596" x2="1144" y2="596" stroke="#3c3836" stroke-width="2"/>
-  <line x1="56" y1="596" x2="1144" y2="596" stroke="#fabd2f" stroke-width="1.5" opacity=".28" class="dash"/>
-
-  <!-- Host to bridge arrows -->
-  <path d="M 280 460 V 488" fill="none" stroke="#fabd2f" stroke-width="1.5" marker-end="url(#arrowYellow)"/>
-  <text class="code-sm" x="288" y="479">session</text>
-  <path d="M 620 460 V 488" fill="none" stroke="#fabd2f" stroke-width="1.5" marker-end="url(#arrowYellow)"/>
-  <text class="code-sm" x="628" y="479">ipc</text>
-
-  <!-- Bridge to container arrow -->
-  <path d="M 906 596 V 640" fill="none" stroke="#8ec07c" stroke-width="1.5" marker-end="url(#arrowAqua)"/>
-  <text class="code-sm" x="916" y="625">exec</text>
+  <!-- Shared HOME arrows -->
+  <path d="M 600 344 V 376" fill="none" stroke="#83a598" stroke-width="1.5" marker-start="url(#arrowAqua)" marker-end="url(#arrowAqua)"/>
+  <text class="code-sm" x="612" y="366">config</text>
+  <path d="M 600 532 V 564" fill="none" stroke="#83a598" stroke-width="1.5" marker-start="url(#arrowAqua)" marker-end="url(#arrowAqua)"/>
+  <text class="code-sm" x="612" y="554">state</text>
 
   <!-- Container panel -->
-  <rect x="532" y="640" width="632" height="228" rx="16" fill="#282828" stroke="#504945"/>
-  <rect x="552" y="660" width="6" height="6" rx="1.5" fill="#8ec07c"/>
-  <text class="section" x="566" y="666" fill="#8ec07c">03 · DEV DISTROBOX</text>
-  <text class="muted" x="552" y="686">Debian · rootless Podman · mutable development layer</text>
-
-  <!-- serve card -->
-  <rect x="552" y="700" width="356" height="148" rx="12" fill="#32302f" stroke="#504945"/>
-  <text class="mono" x="572" y="730" font-size="14.5" font-weight="700" fill="#ebdbb2">opencode-bin serve</text>
-  <circle class="dot" cx="880" cy="725" r="3" fill="#b8bb26"/>
-  <text class="muted" x="872" y="729" text-anchor="end">running</text>
-  <text class="muted" x="572" y="749">HTTP + SSE server</text>
-  <line x1="572" y1="760" x2="888" y2="760" stroke="#3c3836"/>
-  <circle cx="576" cy="780" r="2.5" fill="#8ec07c"/>
-  <text class="body-sm" x="588" y="784">sessions + state under $HOME</text>
-  <circle cx="576" cy="800" r="2.5" fill="#fabd2f"/>
-  <text class="body-sm" x="588" y="804">toolchains injected via mise</text>
-  <circle cx="576" cy="820" r="2.5" fill="#83a598"/>
-  <text class="body-sm" x="588" y="824">serves host GUI, CLI, and TUI clients</text>
+  <rect x="36" y="564" width="1128" height="264" rx="16" fill="#282828" stroke="#504945"/>
+  <rect x="56" y="584" width="6" height="6" rx="1.5" fill="#8ec07c"/>
+  <text class="section" x="70" y="590" fill="#8ec07c">03 · DEV DISTROBOX</text>
+  <text class="code-sm" x="1144" y="590" text-anchor="end">mutable · disposable</text>
+  <text class="muted" x="56" y="612">Debian · rootless Podman · rebuild without touching the host</text>
 
   <!-- mise card -->
-  <rect x="920" y="700" width="224" height="148" rx="12" fill="#32302f" stroke="#504945"/>
-  <text x="940" y="730" font-size="14.5" font-weight="700" fill="#d3869b">mise</text>
-  <text class="muted" x="940" y="748">toolchains</text>
+  <rect x="56" y="628" width="380" height="180" rx="12" fill="#32302f" stroke="#504945"/>
+  <text class="card-title" x="76" y="658">mise</text>
+  <text class="muted" x="76" y="676">language runtimes + CLI tools</text>
 
-  <rect x="940" y="762" width="58" height="24" rx="6" fill="#3c3836" stroke="#fe8019" stroke-opacity=".6"/>
-  <text class="mono" x="969" y="778" font-size="9.5" fill="#fe8019" text-anchor="middle">rust</text>
-  <rect x="1006" y="762" width="48" height="24" rx="6" fill="#3c3836" stroke="#83a598" stroke-opacity=".6"/>
-  <text class="mono" x="1030" y="778" font-size="9.5" fill="#83a598" text-anchor="middle">go</text>
-  <rect x="1062" y="762" width="62" height="24" rx="6" fill="#3c3836" stroke="#b8bb26" stroke-opacity=".6"/>
-  <text class="mono" x="1093" y="778" font-size="9.5" fill="#b8bb26" text-anchor="middle">node</text>
+  <rect x="76" y="692" width="64" height="26" rx="6" fill="#3c3836" stroke="#fe8019" stroke-opacity=".6"/>
+  <text class="mono" x="108" y="709" font-size="9.5" fill="#fe8019" text-anchor="middle">rust</text>
+  <rect x="148" y="692" width="52" height="26" rx="6" fill="#3c3836" stroke="#83a598" stroke-opacity=".6"/>
+  <text class="mono" x="174" y="709" font-size="9.5" fill="#83a598" text-anchor="middle">go</text>
+  <rect x="208" y="692" width="66" height="26" rx="6" fill="#3c3836" stroke="#b8bb26" stroke-opacity=".6"/>
+  <text class="mono" x="241" y="709" font-size="9.5" fill="#b8bb26" text-anchor="middle">node</text>
 
-  <rect x="940" y="794" width="70" height="24" rx="6" fill="#3c3836" stroke="#fabd2f" stroke-opacity=".6"/>
-  <text class="mono" x="975" y="810" font-size="9.5" fill="#fabd2f" text-anchor="middle">python</text>
-  <rect x="1018" y="794" width="48" height="24" rx="6" fill="#3c3836" stroke="#8ec07c" stroke-opacity=".6"/>
-  <text class="mono" x="1042" y="810" font-size="9.5" fill="#8ec07c" text-anchor="middle">gh</text>
-  <text class="code-sm" x="940" y="834">shims on $PATH</text>
+  <rect x="76" y="728" width="74" height="26" rx="6" fill="#3c3836" stroke="#fabd2f" stroke-opacity=".6"/>
+  <text class="mono" x="113" y="745" font-size="9.5" fill="#fabd2f" text-anchor="middle">python</text>
+  <rect x="158" y="728" width="48" height="26" rx="6" fill="#3c3836" stroke="#8ec07c" stroke-opacity=".6"/>
+  <text class="mono" x="182" y="745" font-size="9.5" fill="#8ec07c" text-anchor="middle">gh</text>
 
-  <!-- Animated packets across the bridge -->
+  <line x1="300" y1="688" x2="300" y2="768" stroke="#3c3836"/>
+  <text class="body" x="316" y="708">pinned per repo</text>
+  <text class="muted" x="316" y="728">no global drift</text>
+  <text class="mono" x="316" y="750" font-size="9" fill="#d3869b">mise.toml</text>
+  <text class="code-sm" x="76" y="786">shims on $PATH</text>
+
+  <!-- OpenCode card -->
+  <rect x="456" y="628" width="688" height="180" rx="12" fill="#32302f" stroke="#504945"/>
+  <text class="card-title" x="476" y="658">OpenCode</text>
+  <rect x="1050" y="644" width="74" height="20" rx="10" fill="#3c3836" stroke="#fabd2f" stroke-opacity=".5"/>
+  <text class="mono" x="1087" y="658" font-size="8.5" fill="#fabd2f" text-anchor="middle">curl install</text>
+  <text class="muted" x="476" y="676">one install · shared through $HOME</text>
+
+  <rect x="476" y="692" width="304" height="66" rx="8" fill="#282828" stroke="#fabd2f" stroke-opacity=".45"/>
+  <text class="mono" x="490" y="712" font-size="8.5" letter-spacing="1.2" fill="#fabd2f">PRIMARY · FRONTIER</text>
+  <text class="body" x="490" y="732">plan · decide · review · summarize</text>
+
+  <rect x="794" y="692" width="164" height="66" rx="8" fill="#282828" stroke="#8ec07c" stroke-opacity=".45"/>
+  <text class="mono" x="808" y="712" font-size="8.5" letter-spacing="1.2" fill="#8ec07c">EXPLORE · FAST</text>
+  <text class="body" x="808" y="732">read · search</text>
+  <circle class="dot" cx="936" cy="708" r="3" fill="#8ec07c"/>
+
+  <rect x="970" y="692" width="158" height="66" rx="8" fill="#282828" stroke="#d3869b" stroke-opacity=".45"/>
+  <text class="mono" x="984" y="712" font-size="8.5" letter-spacing="1.2" fill="#d3869b">GENERAL · FAST</text>
+  <text class="body" x="984" y="732">edit · run</text>
+  <circle class="dot" cx="1110" cy="708" r="3" fill="#d3869b"/>
+
+  <text class="code-sm" x="476" y="790">frontier judgment · fast hands · shared sessions</text>
+
+  <!-- Shared state packets -->
   <circle r="3.5" fill="#fabd2f" filter="url(#glow)">
-    <animateMotion dur="4.2s" repeatCount="indefinite" begin="0s"><mpath href="#bridgeFlow"/></animateMotion>
+    <animateMotion dur="5s" repeatCount="indefinite" begin="0s"><mpath href="#sharedFlow"/></animateMotion>
   </circle>
   <circle r="3" fill="#8ec07c" filter="url(#glow)">
-    <animateMotion dur="4.2s" repeatCount="indefinite" begin="-1.4s"><mpath href="#bridgeFlow"/></animateMotion>
+    <animateMotion dur="5s" repeatCount="indefinite" begin="-1.7s"><mpath href="#sharedFlow"/></animateMotion>
   </circle>
   <circle r="3" fill="#83a598" filter="url(#glow)">
-    <animateMotion dur="4.2s" repeatCount="indefinite" begin="-2.8s"><mpath href="#bridgeFlow"/></animateMotion>
+    <animateMotion dur="5s" repeatCount="indefinite" begin="-3.4s"><mpath href="#sharedFlow"/></animateMotion>
   </circle>
-  <circle r="3.5" fill="#8ec07c" filter="url(#glow)">
-    <animateMotion dur="1.6s" repeatCount="indefinite" begin="-0.4s"><mpath href="#dropFlow"/></animateMotion>
+  <circle r="3" fill="#83a598" filter="url(#glow)">
+    <animateMotion dur="1.5s" repeatCount="indefinite" begin="0s"><mpath href="#upFlow"/></animateMotion>
+  </circle>
+  <circle r="3" fill="#8ec07c" filter="url(#glow)">
+    <animateMotion dur="1.5s" repeatCount="indefinite" begin="-0.7s"><mpath href="#downFlow"/></animateMotion>
   </circle>
 
-  <!-- Container pulse -->
-  <circle class="pulse" cx="1060" cy="800" r="46" fill="url(#greenGlow)" opacity=".18"/>
-
-  <!-- Why this split -->
-  <rect x="36" y="700" width="460" height="168" rx="16" fill="#282828" stroke="#504945"/>
-  <rect x="56" y="718" width="6" height="6" rx="1.5" fill="#fabd2f"/>
-  <text class="section" x="70" y="724" fill="#fabd2f">DESIGN RULES</text>
-  <circle cx="60" cy="752" r="2.5" fill="#fabd2f"/>
-  <text class="body" x="72" y="756">Host updates atomically. No package drift.</text>
-  <circle cx="60" cy="778" r="2.5" fill="#8ec07c"/>
-  <text class="body" x="72" y="782">Container is disposable. Rebuild from config.</text>
-  <circle cx="60" cy="804" r="2.5" fill="#83a598"/>
-  <text class="body" x="72" y="808">One $HOME carries config, sessions, models.</text>
-  <line x1="56" y1="828" x2="476" y2="828" stroke="#3c3836"/>
-  <text class="code-sm" x="56" y="852">keep state out of the image</text>
-
-  <text class="muted" x="600" y="890" text-anchor="middle" letter-spacing=".5">Immutable host. Mutable tools. One shared $HOME.</text>
+  <text class="muted" x="600" y="864" text-anchor="middle" letter-spacing=".5">Default host. One container. Two curl installs. One global brief.</text>
 </svg>

@@ -88,7 +88,7 @@
   <rect x="60" y="129" width="6" height="6" rx="1.5" fill="#fe8019"/>
   <text class="section" x="74" y="136" fill="#fe8019">01 · CAPTURE</text>
   <text class="stage-title" x="60" y="162">Audio capture</text>
-  <text class="code-sm" x="60" y="180">F8 hotkey · hex dictate</text>
+  <text class="code-sm" x="60" y="180">F8 hotkey</text>
 
   <g fill="#fe8019">
     <rect class="wbar" x="60" y="242" width="8" height="16" rx="4" style="animation-delay:-0.05s"/>
@@ -199,13 +199,13 @@
   <rect class="blink" x="1014" y="262" width="6" height="12" rx="1" fill="#fabd2f"/>
 
   <circle cx="940" cy="336" r="2.5" fill="#8ec07c"/>
-  <text class="body" x="952" y="340">GlobalShortcuts portal</text>
+  <text class="body" x="952" y="340">Focused window</text>
   <circle cx="940" cy="358" r="2.5" fill="#fabd2f"/>
-  <text class="body" x="952" y="362">F8 dictate · F9 annotate</text>
+  <text class="body" x="952" y="362">Terminal · OpenCode</text>
   <circle cx="940" cy="380" r="2.5" fill="#83a598"/>
-  <text class="body" x="952" y="384">Ctrl+Alt+V paste last</text>
+  <text class="body" x="952" y="384">Text at cursor</text>
   <circle cx="940" cy="402" r="2.5" fill="#fe8019"/>
-  <text class="body" x="952" y="406">hex dictate fallback</text>
+  <text class="body" x="952" y="406">No network hop</text>
 
   <!-- Stage connectors -->
   <path d="M 288 280 H 328" fill="none" stroke="#fe8019" stroke-width="1.6" marker-end="url(#arrowO3)"/>
