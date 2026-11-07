@@ -15,8 +15,9 @@ Default Bluefin, one `dev` container, two curl installs. The host stays immutabl
 - **OpenCode and Hex from curl.** Both install into `$HOME`, so the host and container share the same binaries and config. No host packages, no custom image.
 
 ```bash
+curl https://mise.run | sh
 curl -fsSL https://opencode.ai/install | bash
-curl -fsSL https://anoma.ly/hex/install.sh | sh
+curl -fsSL https://anoma.ly/hex/install-linux.sh | sh
 ```
 
 Host shells need one helper:
@@ -77,7 +78,7 @@ opencode() { distrobox enter dev -- opencode "$@"; }
 - Prefer plain data and functions over deep class hierarchies.
 ```
 
-Why each section carries leverage:
+Each section targets a specific failure mode:
 
 ### Writing
 
