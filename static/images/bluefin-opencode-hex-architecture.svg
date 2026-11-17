@@ -107,7 +107,7 @@
   <text class="body" x="684" y="248" font-weight="600">Vulkan iGPU</text>
   <text class="code-sm" x="684" y="266">parakeet-unified-en · Silero VAD</text>
   <circle cx="620" cy="296" r="2.5" fill="#8ec07c"/>
-  <text class="body-sm" x="632" y="300">F8 dictate · audio never leaves the machine</text>
+  <text class="body-sm" x="632" y="300">F8 dictate · transcribed on-device</text>
 
   <g fill="#fe8019">
     <rect class="wbar" x="992" y="298" width="6" height="8" rx="3" style="animation-delay:-0.1s"/>
