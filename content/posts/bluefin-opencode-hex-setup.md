@@ -4,27 +4,27 @@ title = 'Bluefin, OpenCode, and Hex: One Container, One Brief'
 tags = ["linux", "bluefin", "opencode", "hex", "ai", "wayland"]
 +++
 
-I'm good at turning “install a compiler” into “fiddle with my Linux setup.” This is my attempt to stop doing that. I keep [Bluefin DX](https://docs.projectbluefin.io/bluefin-dx) stock and run OpenCode in one Debian container. Hex stays on the desktop. The 48-line `AGENTS.md` is for the bits I haven't managed to leave alone.
+I'm good at turning “install a compiler” into “fiddle with my Linux setup.” I do the fiddling in one Debian container now and leave [Bluefin DX](https://docs.projectbluefin.io/bluefin-dx) stock. Hex stays on the desktop. OpenCode gets a 48-line `AGENTS.md`, which is short for me.
 
 ## 1. Keep the host boring
 
-I run `ghcr.io/ublue-os/bluefin-dx:stable` and haven't layered any `rpm-ostree` packages. Bluefin handles the Wayland desktop, PipeWire, Vulkan, Flatpak apps, and atomic updates. Hex runs next to the apps it types into.
+I run `ghcr.io/ublue-os/bluefin-dx:stable` without layering any `rpm-ostree` packages. Bluefin handles the Wayland desktop, PipeWire, Vulkan, Flatpaks, and atomic updates.
 
-My [Distrobox](https://distrobox.it/) is named `dev`. It runs Debian 13 on rootless [Podman](https://podman.io/), with [OpenCode](https://opencode.ai/) and [mise](https://mise.jdx.dev/) inside. mise gives me Rust, Go, Node, Python, and `gh`.
+I called my [Distrobox](https://distrobox.it/) `dev`. It's Debian 13 on rootless [Podman](https://podman.io/). [OpenCode](https://opencode.ai/) runs there, and [mise](https://mise.jdx.dev/) supplies Rust, Go, Node, Python, and `gh`.
 
 <figure class="bluefin-figure">
   <img src="/images/bluefin-opencode-hex-architecture.svg" alt="Bluefin DX and Hex run on the host, Debian dev runs OpenCode and mise toolchains, and both environments connect to one shared home directory that is not a sandbox." width="560" height="480">
   <figcaption>The host and container share a home directory. Either can change those files.</figcaption>
 </figure>
 
-Create and enter it from the host:
+Create `dev` on the host, then enter it:
 
 ```bash
 distrobox create --name dev --image docker.io/library/debian:13 --yes
 distrobox enter dev
 ```
 
-Inside `dev`, install the toolchain and [OpenCode V2](https://opencode.ai/docs/). Explicit paths leave shell startup files alone:
+Install the toolchain and [OpenCode V2](https://opencode.ai/docs/) inside `dev`. I use full paths so I can leave `.bashrc` alone:
 
 ```bash
 sudo apt-get update && sudo apt-get install -y ca-certificates curl git
@@ -43,26 +43,26 @@ opencode() {
 }
 ```
 
-`mise exec` supplies tool paths inside `dev`, so the host needs no `mise activate`. If a host OpenCode service is running, [pass `--standalone`](https://opencode.ai/docs/cli#background-service) for a private server in `dev`.
+`mise exec` puts the tools on `PATH` in `dev`. I don't need `mise activate` on the host. If an OpenCode service is already running there, I [pass `--standalone`](https://opencode.ai/docs/cli#background-service) to start a private server in `dev`.
 
-Distrobox shares `$HOME`, so I don't have to copy projects around. It isn't a sandbox. I can still make a mess of my files from inside `dev`.
+Distrobox shares `$HOME`. I can use the same checkout from either shell. I can wreck it from either shell, too. This isn't a sandbox.
 
 ## 2. Keep the brief short
 
-[OpenCode V2](https://opencode.ai/docs/instructions) reads `~/.config/opencode/AGENTS.md` alongside the project's instructions. My habits go in the global file. The repo can tell me how to build it.
+[OpenCode V2](https://opencode.ai/docs/instructions) reads `~/.config/opencode/AGENTS.md` alongside the project's instructions. I put my habits in the global file and leave build commands in the repo that uses them.
 
 <figure class="bluefin-figure">
   <img src="/images/opencode-delegation-flow.svg" alt="Three steps in order: brief and delegate, exercise the change, commit locally. A separate dashed callout holds publishing back until someone asks." width="560" height="544" loading="lazy">
   <figcaption>I still have to say yes to a push.</figcaption>
 </figure>
 
-When I hand off a job, I write down what I want, what not to touch, and how I'll know it's done. The subagent missed the conversation that got us here. Sometimes writing the brief is how I find out I haven't decided what I want.
+The subagent didn't sit through the conversation that got me here. I write down what to do, what not to touch, and how I'll know it's done. Sometimes that's when I find out I don't know what I want yet.
 
-Then I want a check that could actually fail. Run the test, try the command, or open the page. Tell me what passed, failed, or didn't run. Make small, checked commits locally.
+Then I want a check that could actually fail. Run the test, try the command, or open the page. Tell me what passed, failed, or didn't run. Make small local commits once the checks pass.
 
-Pushing, opening or merging a PR, and deploying need my say-so. A push to this blog's `main` publishes it. If I'm going to publish a sentence I regret, I'd like to do it myself.
+No pushing, opening or merging PRs, or deploying until I ask. A push to this blog's `main` publishes it. If I'm going to publish a sentence I regret, I'd like to do it myself.
 
-If I keep catching the same bug, a test has a better shot than line 49 of `AGENTS.md`. A type or lint rule will do, too. Lauren Tan makes this case well in [All Code Is Slop (Except Mine)](https://youtu.be/O_zcc6Xl12g).
+If I keep catching the same bug, a test has a better shot than line 49 of `AGENTS.md`. A type or lint rule will do, too. Lauren Tan makes the case in [All Code Is Slop (Except Mine)](https://youtu.be/O_zcc6Xl12g).
 
 The `modern-web-guidance` line is for a skill I have installed. Leave it out if you don't.
 
@@ -124,11 +124,11 @@ The `modern-web-guidance` line is for a skill I have installed. Leave it out if 
 
 ### Keep the primary session focused
 
-I want the answer to a search in the main session, not every line of `grep` output. Read-only `explore` agents can share a stable checkout. Concurrent writers get separate [git worktrees](https://git-scm.com/docs/git-worktree) and any ports or databases they'd otherwise share.
+I send `explore` to look things up. I want the answer in the main session, not all the `grep` output. Readers can share a stable checkout. Writers get separate [git worktrees](https://git-scm.com/docs/git-worktree), plus their own ports or databases if they'd otherwise collide.
 
 ### Pick a cheaper model for subagents
 
-I don't need the most expensive model I have to find a filename. This `opencode.jsonc` example points `explore` and `general` at a cheaper one without changing the primary model. Put it in the global config and pick a model and variant that exist in `/models`.
+I don't need my priciest model to find a file. Here's how to give the subagents a cheaper one in the global `opencode.jsonc`. Pick a model and variant you see in `/models`:
 
 ```jsonc
 {
@@ -159,8 +159,8 @@ Install [Hex](https://anoma.ly/hex) on the **host**, then open it from the app l
 curl -fsSL https://anoma.ly/hex/files/install-linux.sh | sh
 ```
 
-My setup runs [Parakeet](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2) on the Vulkan iGPU and uses [Silero VAD](https://github.com/snakers4/silero-vad) to detect speech. I turn on spoken formatting and filler-word removal in [Labs](https://github.com/anomalyco/hex/blob/dev/docs/features/labs.md). My shortcut is `F8`; [Hex defaults to `Ctrl+Alt+Space` on GNOME](https://github.com/anomalyco/hex/blob/dev/docs/linux.md#shortcuts).
+[Parakeet](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2) runs on my Vulkan iGPU. [Silero VAD](https://github.com/snakers4/silero-vad) detects speech, and I use [Labs](https://github.com/anomalyco/hex/blob/dev/docs/features/labs.md) for spoken formatting and filler-word removal. I bound `F8`; [Hex defaults to `Ctrl+Alt+Space` on GNOME](https://github.com/anomalyco/hex/blob/dev/docs/linux.md#shortcuts).
 
-Hex transcribes on-device. If I use a remote model for a rewrite or send it a prompt in OpenCode, it can get the transcript. It doesn't get the audio.
+Hex transcribes on-device. The audio stays here. If I use a remote model to rewrite a dictation or submit it to one in OpenCode, that model gets the transcript.
 
 Dictation makes it easier to write a long prompt. I'm trying not to take that as encouragement.
