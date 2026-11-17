@@ -4,49 +4,49 @@ title = 'Bluefin, OpenCode, and Hex: An Immutable Linux Agentic Coding Setup'
 tags = ["linux", "bluefin", "opencode", "hex", "ai", "wayland"]
 +++
 
-Default [Bluefin](https://projectbluefin.io/) keeps the host immutable. One `dev` container absorbs toolchain churn. OpenCode and Hex install into `$HOME`, which carries the config. The highest-leverage piece is a short global `AGENTS.md`: terse writing, delegated work, the smallest useful check, small local commits. It biases behavior; it does not enforce it.
+I keep [Bluefin DX](https://docs.projectbluefin.io/bluefin-dx) stock, run OpenCode and the toolchain in one Debian Distrobox, and dictate with Hex on the host. The part I reuse across projects is a short global `AGENTS.md`: delegate work, check what changed, and commit locally.
 
 ## The stack
 
 <img src="/images/bluefin-opencode-hex-architecture.svg" alt="Bluefin, OpenCode, and Hex architecture" style="width: 100%; max-width: 100%; margin: 1.5rem 0;">
 
-- **Default [Bluefin](https://projectbluefin.io/).** `ghcr.io/ublue-os/bluefin-dx:stable`, zero layered `rpm-ostree` packages. The host keeps Wayland, PipeWire, Vulkan, Flatpak GUI apps, and atomic updates.
+- **Stock Bluefin DX.** `ghcr.io/ublue-os/bluefin-dx:stable`, zero layered `rpm-ostree` packages. The host handles Wayland, PipeWire, Vulkan, Flatpak GUI apps, and atomic updates.
 - **One `dev` [Distrobox](https://distrobox.it/).** Debian 13 on rootless [Podman](https://podman.io/); [mise](https://mise.jdx.dev/) supplies `rust`, `go`, `node`, `python`, and `gh`.
 - **[OpenCode](https://opencode.ai/) and [Hex](https://anoma.ly/hex) ([GitHub](https://github.com/anomalyco/hex)) from curl.** Both install into `$HOME`. Hex runs on the host, OpenCode inside `dev`. No host packages, no custom image.
 
-Bootstrap from the host; `distrobox` needs no layering on Bluefin DX:
+On the host, create and enter `dev`:
 
 ```bash
-distrobox create --name dev --image docker.io/library/debian:13
-distrobox enter dev -- sudo apt-get update
-distrobox enter dev -- sudo apt-get install -y curl ca-certificates git
-distrobox enter dev -- sh -c 'curl https://mise.run | sh'
-distrobox enter dev -- "$HOME/.local/bin/mise" use -g rust go node python gh
-curl -fsSL https://opencode.ai/v2/install | bash
-curl -fsSL https://anoma.ly/hex/files/install-linux.sh | sh
+distrobox create --name dev --image docker.io/library/debian:13 --yes
+distrobox enter dev
 ```
 
-`distrobox create` prompts before pulling an absent image; `--yes` makes that unattended. OpenCode lands in `$HOME/.opencode/bin/opencode`; add `bash -s -- --no-modify-path` to skip rc edits.
-
-For host one-offs, skip the guest login shell. This helper pins both paths, and assumes `~/.local/bin` is on `PATH`:
+Inside `dev`, install the toolchain and [OpenCode V2](https://opencode.ai/docs/). The explicit paths avoid shell startup edits:
 
 ```bash
-mkdir -p "$HOME/.local/bin"
-cat > "$HOME/.local/bin/oc" <<'EOF'
-#!/usr/bin/env bash
-exec distrobox enter dev -- "$HOME/.local/bin/mise" exec -- "$HOME/.opencode/bin/opencode" "$@"
-EOF
-chmod +x "$HOME/.local/bin/oc"
-oc --version
+sudo apt-get update && sudo apt-get install -y ca-certificates curl git
+curl -fsSL https://mise.run | sh
+"$HOME/.local/bin/mise" use -g rust go node python gh
+curl -fsSL https://opencode.ai/v2/install | bash -s -- --no-modify-path
+"$HOME/.local/bin/mise" exec -- "$HOME/.opencode/bin/opencode" --version
 ```
 
-Distrobox forwards the caller's `PATH` but noninteractive shells still miss guest paths, so the helper pins both binaries: no host `mise activate`, no profile edits. `$HOME` is the contract: `~/.config/opencode`, `~/.config/mise`, `~/.local/share/hex`, and [git worktrees](https://git-scm.com/docs/git-worktree) work on both sides. Shared home is convenient, not a sandbox.
+Drop `--version` to launch from `dev`. To launch from a project in a host Bash shell, use this optional function:
+
+```bash
+opencode() {
+  distrobox enter dev -- "$HOME/.local/bin/mise" exec -- \
+    "$HOME/.opencode/bin/opencode" "$@"
+}
+```
+
+`mise exec` supplies tool paths inside `dev`; no host `mise activate` needed. If a host OpenCode service is already running, [use `opencode --standalone`](https://opencode.ai/docs/cli#background-service) with the function to start a private server in `dev`. Both sides can access projects and config in `$HOME`. That's convenient, not a security sandbox.
 
 ## Global AGENTS.md
 
 <img src="/images/opencode-delegation-flow.svg" alt="OpenCode subagent delegation and verification flow" style="width: 100%; max-width: 100%; margin: 1.5rem 0;">
 
-`~/.config/opencode/AGENTS.md` is the centerpiece. [OpenCode V2](https://opencode.ai/docs/instructions) layers global instructions before project ones, so this sets defaults everywhere and a repo's own `AGENTS.md` refines them. Exact contents, 48 lines:
+[OpenCode V2](https://opencode.ai/docs/instructions) combines `~/.config/opencode/AGENTS.md` with project instructions. I keep personal defaults here and repo-specific commands next to the code. Exact contents, 48 lines:
 
 ```markdown
 # Writing
@@ -107,11 +107,11 @@ These are preferences, not guarantees; checks in the repo do the enforcing. Keep
 
 ### Parallelism without collisions
 
-`explore` never writes, so read-only agents can share a stable checkout. Writers cannot: concurrent edits corrupt each other's index and unstaged files. Give each writer its own [git worktree](https://git-scm.com/docs/git-worktree) over the same object store, and isolate other shared resources like ports or databases.
+Read-only `explore` agents can share a stable checkout. Concurrent writers get separate [git worktrees](https://git-scm.com/docs/git-worktree) so they don't collide in the working tree or index. Isolate other shared resources, such as ports and databases, separately.
 
 ### Cost and latency split
 
-`~/.config/opencode/opencode.jsonc` sends `explore` and `general` to a fast model while the primary keeps a frontier one. This `agents` key is an example, not a settled catalog; confirm IDs with `/models` and your provider.
+`~/.config/opencode/opencode.jsonc` routes `explore` and `general` to a fast model without changing the primary model. Adapt this example to a model your provider offers in `/models`:
 
 ```jsonc
 {
@@ -131,7 +131,7 @@ The split spends frontier tokens on decisions, not typing. Credentials belong in
 
 ### Verification as a circuit breaker
 
-Run the smallest check that exercises the change: one test file, one type check, one `--version`. Recurring mistakes become deterministic checks, not paragraphs: a type, a lint rule with a clear message, a regression test. [All Code Is Slop (Except Mine)](https://youtu.be/O_zcc6Xl12g) argues taste does not scale; a CI check does.
+Exercise what changed: run a regression test, try the CLI command, or walk the UI flow. Turn recurring mistakes into types, lint rules, or tests instead of adding prose. Lauren Tan's [All Code Is Slop (Except Mine)](https://youtu.be/O_zcc6Xl12g) makes the case for fixing the code or the checks first.
 
 Publishing is separate. The agent commits locally as it works, in small commits that each pass their checks, but does not `push`, open a PR, or deploy until explicitly asked. Here a push to `main` triggers Pages.
 
@@ -143,8 +143,10 @@ The `# Engineering principles` section names mental models instead of giving gen
 
 <img src="/images/hex-voice-pipeline.svg" alt="Hex local voice dictation pipeline" style="width: 100%; max-width: 100%; margin: 1.5rem 0;">
 
-[Hex](https://anoma.ly/hex) runs local voice dictation on the Vulkan iGPU: [Parakeet](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2) for ASR, [Silero VAD](https://github.com/snakers4/silero-vad) for speech gating, then optional spoken formatting and filler-word removal via the [Labs](https://github.com/anomalyco/hex/blob/dev/docs/features/labs.md) toggles, which I enabled. `F8` is my binding; GNOME's is `Ctrl+Alt+Space`. Audio is transcribed on-device, but text can still leave: optional Output/OpenCode rewriting sends transcripts to its model, and prompted text goes to whichever provider OpenCode uses. Both are explicit choices. See the [Linux docs](https://github.com/anomalyco/hex/blob/dev/docs/linux.md).
+Install [Hex](https://anoma.ly/hex) on the **host** and open it from the app launcher:
 
-If a shared background service runs with different config and you must bypass it, the [CLI docs](https://opencode.ai/docs/cli#background-service) cover `opencode --standalone`.
+```bash
+curl -fsSL https://anoma.ly/hex/files/install-linux.sh | sh
+```
 
-The default host, one container, two app installs, and one short global brief cover most of the setup.
+My setup uses [Parakeet](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2) on the Vulkan iGPU and [Silero VAD](https://github.com/snakers4/silero-vad) to detect speech, with spoken formatting and filler-word removal enabled in [Labs](https://github.com/anomalyco/hex/blob/dev/docs/features/labs.md). I use `F8`; [Hex defaults to `Ctrl+Alt+Space` on GNOME](https://github.com/anomalyco/hex/blob/dev/docs/linux.md#shortcuts). Transcription runs on-device. Optional rewriting in Hex or submitting the dictated text to a remote OpenCode model can send the text off-device.
