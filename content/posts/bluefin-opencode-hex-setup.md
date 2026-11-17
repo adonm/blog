@@ -10,11 +10,11 @@ I'm good at turning “install a compiler” into “fiddle with my Linux setup.
 
 I run `ghcr.io/ublue-os/bluefin-dx:stable` and haven't layered any `rpm-ostree` packages. Bluefin handles the Wayland desktop, PipeWire, Vulkan, Flatpak apps, and atomic updates. Hex runs next to the apps it types into.
 
-[Distrobox](https://distrobox.it/) runs Debian 13 on rootless [Podman](https://podman.io/). I named it `dev` and installed [OpenCode](https://opencode.ai/) and [mise](https://mise.jdx.dev/) inside, which supplies Rust, Go, Node, Python, and `gh`.
+My [Distrobox](https://distrobox.it/) is named `dev`. It runs Debian 13 on rootless [Podman](https://podman.io/), with [OpenCode](https://opencode.ai/) and [mise](https://mise.jdx.dev/) inside. mise gives me Rust, Go, Node, Python, and `gh`.
 
 <figure class="bluefin-figure">
   <img src="/images/bluefin-opencode-hex-architecture.svg" alt="Bluefin DX and Hex run on the host, Debian dev runs OpenCode and mise toolchains, and both environments connect to one shared home directory that is not a sandbox." width="560" height="480">
-  <figcaption>Stock host, mutable container, one shared home. The arrows mean convenience, not isolation.</figcaption>
+  <figcaption>The host and container share a home directory. Either can change those files.</figcaption>
 </figure>
 
 Create and enter it from the host:
@@ -34,7 +34,7 @@ curl -fsSL https://opencode.ai/v2/install | bash -s -- --no-modify-path
 "$HOME/.local/bin/mise" exec -- "$HOME/.opencode/bin/opencode" --version
 ```
 
-Drop `--version` to launch. From host Bash, I start projects through a function:
+Drop `--version` to launch. On the host, I use this Bash function to start OpenCode in `dev`:
 
 ```bash
 opencode() {
@@ -45,27 +45,26 @@ opencode() {
 
 `mise exec` supplies tool paths inside `dev`, so the host needs no `mise activate`. If a host OpenCode service is running, [pass `--standalone`](https://opencode.ai/docs/cli#background-service) for a private server in `dev`.
 
-The function saves typing, not risk. Both sides see the same `$HOME`, so nothing needs copying, and `dev` can still write to my files.
+Distrobox shares `$HOME`, so I don't have to copy projects around. It isn't a sandbox. I can still make a mess of my files from inside `dev`.
 
 ## 2. Keep the brief short
 
-[OpenCode V2](https://opencode.ai/docs/instructions) reads my global `~/.config/opencode/AGENTS.md` alongside project instructions. Personal defaults go global; repo-specific commands go next to the code.
+[OpenCode V2](https://opencode.ai/docs/instructions) reads `~/.config/opencode/AGENTS.md` alongside the project's instructions. My habits go in the global file. The repo can tell me how to build it.
 
 <figure class="bluefin-figure">
   <img src="/images/opencode-delegation-flow.svg" alt="Three steps in order: brief and delegate, exercise the change, commit locally. A separate dashed callout holds publishing back until someone asks." width="560" height="544" loading="lazy">
-  <figcaption>Passing checks lets me commit. It doesn't let me publish.</figcaption>
+  <figcaption>I still have to say yes to a push.</figcaption>
 </figure>
 
-I keep this list because I forget these things:
+When I hand off a job, I write down what I want, what not to touch, and how I'll know it's done. The subagent missed the conversation that got us here. Sometimes writing the brief is how I find out I haven't decided what I want.
 
-- **Brief before delegating.** A freshly delegated agent didn't hear the previous conversation, so the brief carries goal, scope, gotchas, and definition of done. Writing it out shows me when I haven't worked out the request.
-- **Exercise the change.** Run a check that could actually fail: a regression test, the CLI command, the UI path. Say what passed, failed, or didn't run.
-- **Commit locally by default.** Small commits in review order, each passing its checks. Local commits are easy to undo.
-- **Publish only on request.** Pushing, opening a PR, merging, deploying: each needs an explicit yes. A push to this blog's `main` publishes it. If I'm going to publish a sentence I regret, I'd like to do it myself.
+Then I want a check that could actually fail. Run the test, try the command, or open the page. Tell me what passed, failed, or didn't run. Make small, checked commits locally.
 
-If a mistake repeats, add a type constraint, lint rule, or regression test instead of another line of prose. Lauren Tan's [All Code Is Slop (Except Mine)](https://youtu.be/O_zcc6Xl12g) makes the same argument, better.
+Pushing, opening or merging a PR, and deploying need my say-so. A push to this blog's `main` publishes it. If I'm going to publish a sentence I regret, I'd like to do it myself.
 
-I keep tool rules only for tools I use. `modern-web-guidance`, for example, is an installed skill here.
+If I keep catching the same bug, a test has a better shot than line 49 of `AGENTS.md`. A type or lint rule will do, too. Lauren Tan makes this case well in [All Code Is Slop (Except Mine)](https://youtu.be/O_zcc6Xl12g).
+
+The `modern-web-guidance` line is for a skill I have installed. Leave it out if you don't.
 
 <details class="bluefin-details">
 <summary>Read the exact 48-line <code>AGENTS.md</code></summary>
@@ -125,7 +124,7 @@ I keep tool rules only for tools I use. `modern-web-guidance`, for example, is a
 
 ### Keep the primary session focused
 
-Subagents absorb search output and dead ends so I can keep planning. Read-only `explore` agents can share a checkout; concurrent writers get separate [git worktrees](https://git-scm.com/docs/git-worktree), plus ports or databases when needed.
+I want the answer to a search in the main session, not every line of `grep` output. Read-only `explore` agents can share a stable checkout. Concurrent writers get separate [git worktrees](https://git-scm.com/docs/git-worktree) and any ports or databases they'd otherwise share.
 
 ### Pick a cheaper model for subagents
 
@@ -145,13 +144,13 @@ I don't need the most expensive model I have to find a filename. This `opencode.
 }
 ```
 
-**Prior art.** I borrowed most of it. Carson Gross's [Grug](https://grugbrain.dev/) and the [Locality of Behavior](https://htmx.org/essays/locality-of-behaviour/) essay argue for simplicity and nearby code. [Chesterton's fence](https://en.wikipedia.org/wiki/G._K._Chesterton#Chesterton's_fence) says to understand a rule before removing it. [Mitchell Hashimoto](https://mitchellh.com/writing) likes small increments; Casey Muratori's [Semantic Compression](https://caseymuratori.com/blog_0015) starts with concrete code.
+**Prior art.** I borrowed most of it: [Carson Gross's Grug](https://grugbrain.dev/), [Locality of Behavior](https://htmx.org/essays/locality-of-behaviour/), [Chesterton's fence](https://en.wikipedia.org/wiki/G._K._Chesterton#Chesterton's_fence), [Mitchell Hashimoto](https://mitchellh.com/writing) on small increments, and Casey Muratori's [Semantic Compression](https://caseymuratori.com/blog_0015) on starting with concrete code.
 
 ## 3. Keep the audio local
 
 <figure class="bluefin-figure">
   <img src="/images/hex-voice-pipeline.svg" alt="Hex transcribes microphone audio on the device. Hex can paste the transcript into the focused app; only text can go to a remote model if you rewrite or submit it." width="560" height="656" loading="lazy">
-  <figcaption>The microphone feeds Hex, not a model provider. Local dictation and remote model use are separate.</figcaption>
+  <figcaption>Hex does the listening. A remote model only gets text.</figcaption>
 </figure>
 
 Install [Hex](https://anoma.ly/hex) on the **host**, then open it from the app launcher:
@@ -162,6 +161,6 @@ curl -fsSL https://anoma.ly/hex/files/install-linux.sh | sh
 
 My setup runs [Parakeet](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2) on the Vulkan iGPU and uses [Silero VAD](https://github.com/snakers4/silero-vad) to detect speech. I turn on spoken formatting and filler-word removal in [Labs](https://github.com/anomalyco/hex/blob/dev/docs/features/labs.md). My shortcut is `F8`; [Hex defaults to `Ctrl+Alt+Space` on GNOME](https://github.com/anomalyco/hex/blob/dev/docs/linux.md#shortcuts).
 
-Hex transcribes on-device. Rewriting a dictation with a remote model, or submitting it in OpenCode, can send the transcript, not the audio. I treat a dictated prompt like a typed one: I decide when to send it.
+Hex transcribes on-device. If I use a remote model for a rewrite or send it a prompt in OpenCode, it can get the transcript. It doesn't get the audio.
 
 Dictation makes it easier to write a long prompt. I'm trying not to take that as encouragement.
