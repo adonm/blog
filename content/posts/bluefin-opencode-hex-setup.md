@@ -1,27 +1,30 @@
 +++
 date = '2026-11-07'
-title = 'Bluefin, OpenCode, and Hex: An Immutable Linux Agentic Coding Setup'
+title = 'Bluefin, OpenCode, and Hex: One Container, One Brief'
 tags = ["linux", "bluefin", "opencode", "hex", "ai", "wayland"]
 +++
 
-I keep [Bluefin DX](https://docs.projectbluefin.io/bluefin-dx) stock, run OpenCode and the toolchain in one Debian Distrobox, and dictate with Hex on the host. The part I reuse across projects is a short global `AGENTS.md`: delegate work, check what changed, and commit locally.
+I keep [Bluefin DX](https://docs.projectbluefin.io/bluefin-dx) stock so changing toolchains doesn't touch the system image. OpenCode runs in one Debian container; Hex takes dictation on the desktop. A 48-line `AGENTS.md` sets the defaults for the work itself: check the change, commit locally, and publish only when asked.
 
-## The stack
+## 1. Keep the host boring
 
-<img src="/images/bluefin-opencode-hex-architecture.svg" alt="Bluefin, OpenCode, and Hex architecture" style="width: 100%; max-width: 100%; margin: 1.5rem 0;">
+The host runs `ghcr.io/ublue-os/bluefin-dx:stable` with no layered `rpm-ostree` packages. Bluefin handles the Wayland desktop, PipeWire, Vulkan, Flatpak apps, and atomic updates. Hex runs there, next to the apps it types into.
 
-- **Stock Bluefin DX.** `ghcr.io/ublue-os/bluefin-dx:stable`, zero layered `rpm-ostree` packages. The host handles Wayland, PipeWire, Vulkan, Flatpak GUI apps, and atomic updates.
-- **One `dev` [Distrobox](https://distrobox.it/).** Debian 13 on rootless [Podman](https://podman.io/); [mise](https://mise.jdx.dev/) supplies `rust`, `go`, `node`, `python`, and `gh`.
-- **[OpenCode](https://opencode.ai/) and [Hex](https://anoma.ly/hex) ([GitHub](https://github.com/anomalyco/hex)) from curl.** Both install into `$HOME`. Hex runs on the host, OpenCode inside `dev`. No host packages, no custom image.
+One [Distrobox](https://distrobox.it/) named `dev` runs Debian 13 on rootless [Podman](https://podman.io/). I install [OpenCode](https://opencode.ai/) and [mise](https://mise.jdx.dev/) there; mise supplies Rust, Go, Node, Python, and `gh`.
 
-On the host, create and enter `dev`:
+<figure class="bluefin-figure">
+  <img src="/images/bluefin-opencode-hex-architecture.svg" alt="Bluefin DX and Hex run on the host, Debian dev runs OpenCode and mise toolchains, and both environments connect to one shared home directory that is not a sandbox." width="560" height="480">
+  <figcaption>Stock host, mutable container, one shared home. The arrows show convenience, not isolation.</figcaption>
+</figure>
+
+Create and enter it from the host:
 
 ```bash
 distrobox create --name dev --image docker.io/library/debian:13 --yes
 distrobox enter dev
 ```
 
-Inside `dev`, install the toolchain and [OpenCode V2](https://opencode.ai/docs/). The explicit paths avoid shell startup edits:
+Inside `dev`, install the toolchain and [OpenCode V2](https://opencode.ai/docs/). Explicit paths keep shell startup files untouched:
 
 ```bash
 sudo apt-get update && sudo apt-get install -y ca-certificates curl git
@@ -31,7 +34,7 @@ curl -fsSL https://opencode.ai/v2/install | bash -s -- --no-modify-path
 "$HOME/.local/bin/mise" exec -- "$HOME/.opencode/bin/opencode" --version
 ```
 
-Drop `--version` to launch from `dev`. To launch from a project in a host Bash shell, use this optional function:
+Drop `--version` to launch. To start from a project in a host Bash shell, add a function:
 
 ```bash
 opencode() {
@@ -40,13 +43,30 @@ opencode() {
 }
 ```
 
-`mise exec` supplies tool paths inside `dev`; no host `mise activate` needed. If a host OpenCode service is already running, [use `opencode --standalone`](https://opencode.ai/docs/cli#background-service) with the function to start a private server in `dev`. Both sides can access projects and config in `$HOME`. That's convenient, not a security sandbox.
+`mise exec` supplies tool paths inside `dev`; no host `mise activate` needed. If a host OpenCode service is already running, [pass `--standalone`](https://opencode.ai/docs/cli#background-service) for a private server in `dev`.
 
-## Global AGENTS.md
+Both sides see the same `$HOME`, so projects and config don't need copying. That isn't a sandbox: `dev` can still write to your files there.
 
-<img src="/images/opencode-delegation-flow.svg" alt="OpenCode subagent delegation and verification flow" style="width: 100%; max-width: 100%; margin: 1.5rem 0;">
+## 2. Keep the brief short
 
-[OpenCode V2](https://opencode.ai/docs/instructions) combines `~/.config/opencode/AGENTS.md` with project instructions. I keep personal defaults here and repo-specific commands next to the code. Exact contents, 48 lines:
+[OpenCode V2](https://opencode.ai/docs/instructions) reads my global `~/.config/opencode/AGENTS.md` alongside project instructions. I keep personal defaults in the global file and repo-specific commands next to the code.
+
+<figure class="bluefin-figure">
+  <img src="/images/opencode-delegation-flow.svg" alt="Three steps in order: brief and delegate, exercise the change, commit locally. A separate dashed callout holds publishing back until someone asks." width="560" height="544" loading="lazy">
+  <figcaption>Passing checks is a condition for committing, not permission to publish.</figcaption>
+</figure>
+
+- **Brief before delegating.** Give subagents the goal, scope, gotchas, and definition of done. They don't inherit the primary session's history.
+- **Exercise the change.** Run the smallest real check: a regression test, the CLI command, the UI path. Report what passed, failed, or did not run.
+- **Commit locally by default.** Small commits in review order, each passing its checks.
+- **Publish only on request.** Pushing, opening or merging PRs, and deploying need an explicit yes. A push to this blog's `main` publishes the site.
+
+If a mistake repeats, add a type constraint, lint rule, or regression test instead of another line of prose. Lauren Tan's [All Code Is Slop (Except Mine)](https://youtu.be/O_zcc6Xl12g) makes the case for fixing the code or checks first. Prose sets expectations; checks enforce them.
+
+Keep tool-specific rules only for tools you use. `modern-web-guidance`, for example, is an installed skill here.
+
+<details class="bluefin-details">
+<summary>Read the exact 48-line <code>AGENTS.md</code></summary>
 
 ```markdown
 # Writing
@@ -99,19 +119,15 @@ opencode() {
 - Use the repo's existing UI stack. Default to [Oat](https://oat.ink) (`@knadh/oat`) for standalone reports and new UIs without an established stack. Prefer semantic HTML and accessible inline SVG.
 ```
 
-These are preferences, not guarantees; checks in the repo do the enforcing. Keep tool-specific lines only for tools you have: `modern-web-guidance` is an installed skill here.
+</details>
 
-### Context window hygiene
+### Keep the primary session focused
 
-`grep` output, whole-file reads, and dead ends crowd out the task; disposable subagents absorb that, leaving the primary window for planning, review, and summary.
+Subagents absorb search output and dead ends so the primary session has room for planning and review. Read-only `explore` agents can share a stable checkout. Give concurrent writers separate [git worktrees](https://git-scm.com/docs/git-worktree), and give them separate ports or databases when they need them.
 
-### Parallelism without collisions
+### Pick a cheaper model for subagents
 
-Read-only `explore` agents can share a stable checkout. Concurrent writers get separate [git worktrees](https://git-scm.com/docs/git-worktree) so they don't collide in the working tree or index. Isolate other shared resources, such as ports and databases, separately.
-
-### Cost and latency split
-
-`~/.config/opencode/opencode.jsonc` routes `explore` and `general` to a fast model without changing the primary model. Adapt this example to a model your provider offers in `/models`:
+This `opencode.jsonc` example sets a fast model for `explore` and `general` without changing the primary model. Put it in the global config directory and choose a model and variant available in `/models`:
 
 ```jsonc
 {
@@ -127,26 +143,21 @@ Read-only `explore` agents can share a stable checkout. Concurrent writers get s
 }
 ```
 
-The split spends frontier tokens on decisions, not typing. Credentials belong in the provider's login flow.
+**Prior art.** [Grug](https://grugbrain.dev/) and [Locality of Behavior](https://htmx.org/essays/locality-of-behaviour/) favor simplicity and nearby code. [Chesterton's fence](https://en.wikipedia.org/wiki/G._K._Chesterton#Chesterton's_fence) says to understand a rule before removing it. [Mitchell Hashimoto](https://mitchellh.com/writing) favors small increments, and Casey Muratori's [Semantic Compression](https://caseymuratori.com/blog_0015) starts with concrete code.
 
-### Verification as a circuit breaker
+## 3. Keep the audio local
 
-Exercise what changed: run a regression test, try the CLI command, or walk the UI flow. Turn recurring mistakes into types, lint rules, or tests instead of adding prose. Lauren Tan's [All Code Is Slop (Except Mine)](https://youtu.be/O_zcc6Xl12g) makes the case for fixing the code or the checks first.
+<figure class="bluefin-figure">
+  <img src="/images/hex-voice-pipeline.svg" alt="Hex transcribes microphone audio on the device. Hex can paste the transcript into the focused app; only text can go to a remote model if you rewrite or submit it." width="560" height="656" loading="lazy">
+  <figcaption>Local dictation and remote model use are separate: the microphone feeds Hex, not a model provider.</figcaption>
+</figure>
 
-Publishing is separate. The agent commits locally as it works, in small commits that each pass their checks, but does not `push`, open a PR, or deploy until explicitly asked. Here a push to `main` triggers Pages.
-
-### Prior art as compressed judgment
-
-The `# Engineering principles` section names mental models instead of giving generic advice. [The Grug Brained Developer](https://grugbrain.dev/) and [Locality of Behavior](https://htmx.org/essays/locality-of-behaviour/) push against indirection. [Chesterton's fence](https://en.wikipedia.org/wiki/G._K._Chesterton#Chesterton's_fence) blocks deletion without understanding. [Mitchell Hashimoto](https://mitchellh.com/writing) favors small increments and explicit code. [Casey Muratori](https://caseymuratori.com/)'s [Semantic Compression](https://caseymuratori.com/blog_0015) favors concrete code, plain data, and measured performance.
-
-## Hex: local voice input
-
-<img src="/images/hex-voice-pipeline.svg" alt="Hex local voice dictation pipeline" style="width: 100%; max-width: 100%; margin: 1.5rem 0;">
-
-Install [Hex](https://anoma.ly/hex) on the **host** and open it from the app launcher:
+Install [Hex](https://anoma.ly/hex) on the **host**, then open it from the app launcher:
 
 ```bash
 curl -fsSL https://anoma.ly/hex/files/install-linux.sh | sh
 ```
 
-My setup uses [Parakeet](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2) on the Vulkan iGPU and [Silero VAD](https://github.com/snakers4/silero-vad) to detect speech, with spoken formatting and filler-word removal enabled in [Labs](https://github.com/anomalyco/hex/blob/dev/docs/features/labs.md). I use `F8`; [Hex defaults to `Ctrl+Alt+Space` on GNOME](https://github.com/anomalyco/hex/blob/dev/docs/linux.md#shortcuts). Transcription runs on-device. Optional rewriting in Hex or submitting the dictated text to a remote OpenCode model can send the text off-device.
+My setup runs [Parakeet](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2) on the Vulkan iGPU and uses [Silero VAD](https://github.com/snakers4/silero-vad) to detect speech. I turn on spoken formatting and filler-word removal in [Labs](https://github.com/anomalyco/hex/blob/dev/docs/features/labs.md). My shortcut is `F8`; [Hex defaults to `Ctrl+Alt+Space` on GNOME](https://github.com/anomalyco/hex/blob/dev/docs/linux.md#shortcuts).
+
+Hex transcribes on-device. Rewriting a dictation with a remote model, or submitting it to a remote model in OpenCode, can send the transcript, not the audio. I treat a dictated prompt the same way I treat a typed one: I decide when to send it.

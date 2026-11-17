@@ -1,0 +1,76 @@
+// Project overrides for the Bluefin / OpenCode / Hex post only.
+// Imported last by the theme's main.scss.
+
+.post:has(.bluefin-figure) {
+  max-inline-size: 76ch;
+
+  .post-title {
+    font-size: clamp(1.625rem, 6vw, 2rem);
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+}
+
+.bluefin-figure {
+  margin: 2rem 0;
+
+  img {
+    display: block;
+    inline-size: 100%;
+    max-inline-size: 560px;
+    block-size: auto;
+    margin-inline: auto;
+    border: 1px solid rgba($light-color, .18);
+    border-radius: .5rem;
+  }
+
+  figcaption {
+    max-inline-size: 560px;
+    margin: .75rem auto 0;
+    color: rgba($light-color, .8);
+    font-size: .9rem;
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+}
+
+.bluefin-details {
+  margin: 1.5rem 0;
+  border: 1px solid rgba($light-color, .2);
+  border-radius: .5rem;
+  background: $darkest-color;
+
+  > summary {
+    box-sizing: border-box;
+    min-height: 44px;
+    padding: .65em 1em;
+    color: $lightest-color;
+    cursor: pointer;
+    line-height: 1.5;
+
+    &:focus-visible {
+      outline: 3px solid $primary-color;
+      outline-offset: 2px;
+    }
+  }
+
+  &[open] > summary {
+    border-bottom: 1px solid rgba($light-color, .2);
+  }
+
+  // The embedded brief is long; wrap it rather than scrolling sideways on phones.
+  .highlight > pre,
+  > pre {
+    margin: 0;
+    border-left: 0;
+    padding: 1em;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (pointer: coarse) {
+  .bluefin-details > summary {
+    min-height: 48px;
+  }
+}
