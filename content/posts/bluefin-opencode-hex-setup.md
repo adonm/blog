@@ -4,7 +4,7 @@ title = 'Bluefin, OpenCode, and Hex: One Container, One Brief'
 tags = ["linux", "bluefin", "opencode", "hex", "ai", "wayland"]
 +++
 
-I'm good at turning “install a compiler” into “fiddle with my Linux setup.” I do the fiddling in one Debian container now and leave [Bluefin DX](https://docs.projectbluefin.io/bluefin-dx) stock. Hex stays on the desktop. OpenCode gets a 48-line `AGENTS.md`, which is short for me.
+I'm good at turning “install a compiler” into “fiddle with my Linux setup.” I do the fiddling in one Debian container now and leave [Bluefin DX](https://docs.projectbluefin.io/bluefin-dx) stock. Hex stays on the desktop. OpenCode gets a 27-line `AGENTS.md`, which is short for me.
 
 ## 1. Keep the host boring
 
@@ -62,62 +62,39 @@ Then I want a check that could actually fail. Run the test, try the command, or 
 
 No pushing, opening or merging PRs, or deploying until I ask. A push to this blog's `main` publishes it. If I'm going to publish a sentence I regret, I'd like to do it myself.
 
-If I keep catching the same bug, a test has a better shot than line 49 of `AGENTS.md`. A type or lint rule will do, too. Lauren Tan makes the case in [All Code Is Slop (Except Mine)](https://youtu.be/O_zcc6Xl12g).
-
-The `modern-web-guidance` line is for a skill I have installed. Leave it out if you don't.
+If I keep catching the same bug, a test has a better shot than line 28 of `AGENTS.md`. A type or lint rule will do, too. Lauren Tan makes the case in [All Code Is Slop (Except Mine)](https://youtu.be/O_zcc6Xl12g).
 
 <details class="bluefin-details">
-<summary>Read the exact 48-line <code>AGENTS.md</code></summary>
+<summary>Read the exact 27-line <code>AGENTS.md</code></summary>
 
 ```markdown
 # Writing
 
 - Be terse. Cut filler, hedging, and meta-commentary.
-- Lead with subject and verb, never `What ...` or `The way ...` openers (`"What X is..."` -> `"X is..."`; `"What this prototype implements"` -> `"This prototype implements"`).
-- State reality directly: separate what exists now from production (`"This repo uses placeholder X now; production uses Y"`).
+- Lead with subject and verb, never `What ...` or `The way ...` openers.
+- State reality directly: separate what exists now from target/production behavior.
 
 # Delegation
 
-- Delegate hands-on work: `explore` for reading/search, `general` for multi-step research, edits, and commands. Keep the primary agent for planning, decisions, review, and summary.
-- Work directly only on trivial single steps. Put your context into the subagent brief instead of doing the work yourself.
-- Subagents start fresh: state goal, scope, expected size, gotchas, and definition of done. Tell them to stop and report rather than expand scope.
-- Parallelize independent work. Read-only agents may share a stable checkout; give concurrent writers separate worktrees and isolate other mutable resources.
-- Check tool output before rerunning when results look missing. Spot-check key subagent claims.
+- Primary plans, briefs, spot-checks (1–2 read-only checks), and summarizes. Delegate reads/search to `explore` and multi-step research, skill lookups, edits, builds, and commits to `general`.
+- Act directly only when the whole turn takes 1–2 tool calls with no edit-build-check loop.
+- After launching background subagents, end the turn—don't fetch docs or build harnesses alongside them. Send revisions to the subagent's `sessionID` instead of patching its output yourself.
+- Briefs state goal, scope, gotchas, and definition of done (`stop and report`). Read-only agents may share a checkout; concurrent writers get separate worktrees and isolated ports/DBs.
 
-# Verification
+# Verification & Git
 
-- Exercise changed behavior with the smallest relevant test or runtime check. Report what passed, failed, or wasn't run.
-- Turn recurring bugs and agent mistakes into deterministic checks (types, lint rules with clear fix messages, tests) instead of adding prose or comments.
-- Require passing checks before an authorized push, merge, deploy, or destructive action. Use `&&` when chaining; report failures immediately.
+- Exercise changed behavior with the smallest real check (prefer integration/regression tests over brittle unit tests); report what passed, failed, or wasn't run.
+- Turn recurring bugs or agent mistakes into types, lint rules, or tests—not more prose or comments.
+- Commit implementation edits locally in small, checked, review-order commits (`<ticket>: <imperative summary>` when known; *why* and constraints in body).
+- Push, open/merge PRs, deploy, delete, squash, or rewrite history only when explicitly asked, gated on passing checks with `&&` (lead PRs with blast radius, review order, and checks).
 
-# Commits & PRs
+# Code & Web
 
-- Commit locally as you implement, unless asked not to. Stage and commit only your edits for the task. Make small, logical commits in review order; each must build and pass relevant checks.
-- Use `<ticket>: <imperative summary>` when the ticket is known; otherwise omit the prefix. Explain why and note non-obvious constraints in the body.
-- Lead PR descriptions with who or what is affected, where to start reviewing, and which checks passed, failed, or weren't run.
-- Push, open or merge PRs, squash commits, or rewrite pushed history only when explicitly asked.
-
-# Engineering principles
-
-- Keep the core small: cut unrequested features and abstractions; offer the 80/20 solution.
-- Keep behavior local (locality of behavior) rather than split across layers.
-- Prefer boring, proven tech and the simplest stack that fits.
-- Favor integration tests over brittle unit tests; add a regression test for every bug fix.
-- Name intermediate values over clever one-liners; optimize for debuggability.
-- Chesterton's fence: understand why code exists before removing it.
-- Match repo conventions, not repo tech debt: don't copy deprecated patterns or hacks into new code.
-- Fix root causes instead of patching symptoms with timers, retries, casts, or lint suppressions; never use comments or docs to justify a workaround (comment only non-obvious invariants and external constraints).
-- Make it work, then make it good: ship small, demoable increments, not big-bang rewrites.
-- Design from the user out: good defaults, clear errors, and docs are part of the feature.
-- Compression-oriented programming: write concrete code first; extract only after repetition appears (some duplication beats the wrong abstraction).
-- Prefer explicit code over magic and indirection; don't hide what the machine is doing.
-- Treat performance as design: avoid needless allocations and layers; measure, don't guess.
-- Prefer plain data and functions over deep class hierarchies.
-
-# Web & reports
-
-- Query `modern-web-guidance` (`search` then `retrieve`) first on HTML, CSS, and client-JS tasks instead of relying on training-weight patterns.
-- Use the repo's existing UI stack. Default to [Oat](https://oat.ink) (`@knadh/oat`) for standalone reports and new UIs without an established stack. Prefer semantic HTML and accessible inline SVG.
+- Keep the core small and local: plain data and functions, explicit control flow, concrete code first—extract only after repetition, and cut unrequested features or layers.
+- Respect Chesterton's fence before deleting, and don't copy repo tech debt or hacks into new code.
+- Fix root causes instead of patching with timers, retries, casts, or suppressions; comment only non-obvious invariants and external constraints, never to excuse a workaround.
+- Measure before optimizing; avoid needless allocations and indirection.
+- Default new standalone UIs/reports (when a repo has no stack) to [Oat](https://oat.ink) (`@knadh/oat`), semantic HTML, and accessible inline SVG.
 ```
 
 </details>
